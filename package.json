@@ -1,0 +1,23 @@
+{
+  "name": "lms",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "husky",
+    "lint": "npm run lint --prefix client && npm run lint --prefix server",
+    "format": "npm run format --prefix client && npm run format --prefix server",
+    "build": "npm run build --prefix client && npm run build --prefix server",
+    "lint-staged": "lint-staged"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  }
+}
