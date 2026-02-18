@@ -1,10 +1,10 @@
 export default {
     'client/src/**/*.{ts,tsx}': [
-        'npm run lint --prefix client',
-        'npm run format --prefix client',
+        'npm run lint --prefix client --',
+        'npm run format --prefix client --',
     ],
     'server/src/**/*.ts': [
-        'npm run lint --prefix server',
-        'npm run format --prefix server',
+        'npm run lint --prefix server --',
+        'npm run format --prefix server --',
     ],
 };
