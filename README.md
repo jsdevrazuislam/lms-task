@@ -17,8 +17,21 @@ We enforce strict engineering standards to ensure the codebase remains maintaina
 - **ESLint**: Strictly configured across both applications. Commit/Push will fail if any errors exist.
 - **Git Hooks**: Managed by **Husky**.
   - `pre-commit`: Runs `lint-staged` to check only your changes.
-  - `commit-msg`: Enforces **Conventional Commits** (feat, fix, refactor, etc.).
+  - `commit-msg`: Enforces **Conventional Commits**.
+  - `pre-push`: Full workspace build verification.
 - **TypeScript**: Full type safety with zero tolerance for `any` in production code.
+
+## 🔄 Git Workflow & Pull Request Quality Gates
+
+This project follows a professional Git workflow to ensure only high-quality, production-ready code merges into the `main` branch.
+
+### Pull Request Validation Pipeline
+Every PR triggered for the `main` branch executes the following automated checks:
+- **ESLint**: Ensures consistent code style and prevents unsafe patterns.
+- **TypeScript Type Checking**: Verifies that all code is type-safe.
+- **Build Validation**: Guarantees both client and server build successfully.
+
+Only when all checks pass can the PR be merged.
 
 ### Core Implementation
 - **RBAC**: Multi-role security (Super Admin, Admin, Instructor, Student) handled via Next.js Middleware and custom HOCs.
