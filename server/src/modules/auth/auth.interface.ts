@@ -27,3 +27,20 @@ export interface IAuthResponse {
     lastName: string;
   };
 }
+
+/**
+ * Payload for JWT tokens
+ */
+export interface ITokenPayload {
+  id: string;
+  email: string;
+  role: string;
+}
+
+/**
+ * Response for refresh token logic
+ */
+export interface IRefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}

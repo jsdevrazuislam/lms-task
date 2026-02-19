@@ -24,6 +24,27 @@ const options: swaggerJsdoc.Options = {
           bearerFormat: 'JWT',
         },
       },
+      schemas: {
+        Course: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            title: { type: 'string' },
+            description: { type: 'string' },
+            thumbnail: { type: 'string' },
+            price: { type: 'number' },
+            status: {
+              type: 'string',
+              enum: ['DRAFT', 'PUBLISHED', 'ARCHIVED'],
+            },
+            instructorId: { type: 'string' },
+            categoryId: { type: 'string' },
+            isDeleted: { type: 'boolean' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
+      },
     },
     security: [
       {

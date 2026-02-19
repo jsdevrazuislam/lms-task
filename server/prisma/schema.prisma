@@ -17,22 +17,35 @@ enum UserRole {
 enum CourseStatus {
   DRAFT
   PUBLISHED
+  ARCHIVED
 }
 
 model User {
-  id          String           @id @default(uuid())
-  email       String           @unique
-  password    String
-  firstName   String
-  lastName    String
-  role        UserRole         @default(STUDENT)
-  courses     Course[]         @relation("InstructorCourses")
-  enrollments Enrollment[]
-  progress    LessonProgress[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  id            String           @id @default(uuid())
+  email         String           @unique
+  password      String
+  firstName     String
+  lastName      String
+  role          UserRole         @default(STUDENT)
+  courses       Course[]         @relation("InstructorCourses")
+  enrollments   Enrollment[]
+  progress      LessonProgress[]
+  refreshTokens RefreshToken[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 
   @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
 }
 
 model Course {
@@ -40,8 +53,12 @@ model Course {
   title        String
   description  String?
   thumbnail    String?
+  price        Float
+  isDeleted    Boolean      @default(false)
   instructorId String
   instructor   User         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  categoryId   String
+  category     Category     @relation(fields: [categoryId], references: [id])
   status       CourseStatus @default(DRAFT)
   modules      Module[]
   enrollments  Enrollment[]
@@ -49,6 +66,16 @@ model Course {
   updatedAt    DateTime     @updatedAt
 
   @@map("courses")
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  courses   Course[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
 }
 
 model Module {

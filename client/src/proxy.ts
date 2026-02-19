@@ -13,7 +13,7 @@ const roleRoutes = {
 };
 */
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { nextUrl } = request;
   const token = request.cookies.get("token")?.value; // Prefer HttpOnly cookie for production
 
