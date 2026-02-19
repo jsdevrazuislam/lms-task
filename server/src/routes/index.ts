@@ -3,7 +3,7 @@ import express from 'express';
 import { authRoutes } from '../modules/auth/auth.routes.js';
 import { CourseRoutes } from '../modules/course/course.routes.js';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 const moduleRoutes = [
   {

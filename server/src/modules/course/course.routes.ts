@@ -234,4 +234,4 @@ router.delete(
   courseController.deleteCourse
 );
 
-export const CourseRoutes = router;
+export const CourseRoutes: express.Router = router;

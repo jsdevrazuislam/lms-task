@@ -134,4 +134,4 @@ router.get(
   authController.getMe
 );
 
-export const authRoutes = router;
+export const authRoutes: express.Router = router;
