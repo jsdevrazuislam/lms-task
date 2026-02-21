@@ -1,5 +1,7 @@
-import express from 'express';
+import express, { Router } from 'express';
 
+import { UserRole } from '../../common/constants/roles.js';
+import auth from '../../common/middlewares/auth.middleware.js';
 import validateRequest from '../../common/middlewares/validateRequest.js';
 
 import { authController } from './auth.controller.js';
@@ -81,4 +83,55 @@ router.post(
   authController.login
 );
 
-export const authRoutes = router;
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: User logout
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: User logged out successfully
+ */
+router.post('/logout', authController.logout);
+
+/**
+ * @swagger
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Refresh access token
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ */
+router.post(
+  '/refresh-token',
+  validateRequest(AuthValidation.refreshTokenValidationSchema),
+  authController.refreshToken
+);
+
+/**
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: Get current authenticated user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile fetched successfully
+ */
+router.get(
+  '/me',
+  auth(
+    UserRole.STUDENT,
+    UserRole.INSTRUCTOR,
+    UserRole.ADMIN,
+    UserRole.SUPER_ADMIN
+  ),
+  authController.getMe
+);
+
+export const AuthRoutes: Router = router;

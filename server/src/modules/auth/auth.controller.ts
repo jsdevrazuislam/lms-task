@@ -59,6 +59,65 @@ export class AuthController {
       },
     });
   });
+
+  /**
+   * User logout
+   */
+  logout = catchAsync(async (req: Request, res: Response) => {
+    const { refreshToken } = req.cookies;
+
+    if (refreshToken) {
+      await authService.logout(refreshToken);
+    }
+
+    res.clearCookie('refreshToken');
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'User logged out successfully',
+      data: null,
+    });
+  });
+
+  /**
+   * Refresh token
+   */
+  refreshToken = catchAsync(async (req: Request, res: Response) => {
+    const { refreshToken: oldToken } = req.cookies;
+    const result = await authService.refreshToken(oldToken);
+    const { refreshToken: newRefreshToken, accessToken } = result;
+
+    // Set new refresh token in cookie
+    res.cookie('refreshToken', newRefreshToken, {
+      secure: config.NODE_ENV === 'production',
+      httpOnly: true,
+    });
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Token refreshed successfully',
+      data: {
+        accessToken,
+      },
+    });
+  });
+
+  /**
+   * Get current user
+   */
+  getMe = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.user;
+    const result = await authService.getMe(id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'User profile fetched successfully',
+      data: result,
+    });
+  });
 }
 
 export const authController = new AuthController();

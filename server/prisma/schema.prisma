@@ -7,6 +7,193 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id            String           @id @default(uuid())
+  email         String           @unique
+  password      String
+  firstName     String
+  lastName      String
+  role          UserRole         @default(STUDENT)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  courses       Course[]         @relation("InstructorCourses")
+  enrollments   Enrollment[]
+  progress      LessonProgress[]
+  payments      Payment[]
+  reviews       Review[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model Course {
+  id              String       @id @default(uuid())
+  title           String
+  subtitle        String?
+  description     String?
+  thumbnail       String?
+  price           Float
+  tags            String[]     @default([])
+  metaDescription String?
+  isDeleted       Boolean      @default(false)
+  instructorId    String
+  categoryId      String
+  status          CourseStatus @default(DRAFT)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  duration        String?
+  level           CourseLevel  @default(BEGINNER)
+  originalPrice   Float?
+  rating          Float        @default(0)
+  requirements    String[]     @default([])
+  whatYouLearn    String[]     @default([])
+  category        Category     @relation(fields: [categoryId], references: [id])
+  instructor      User         @relation("InstructorCourses", fields: [instructorId], references: [id])
+  enrollments     Enrollment[]
+  payments        Payment[]
+  reviews         Review[]
+  modules         Module[]
+
+  @@map("courses")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  courses     Course[]
+
+  @@map("categories")
+}
+
+model Module {
+  id        String   @id @default(uuid())
+  title     String
+  order     Int
+  courseId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  duration  String?
+  lessons   Lesson[]
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("modules")
+}
+
+model Lesson {
+  id          String           @id @default(uuid())
+  title       String
+  content     String?
+  videoUrl    String?
+  order       Int
+  moduleId    String
+  contentType String           @default("video")
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  duration    String?
+  isFree      Boolean          @default(false)
+  progress    LessonProgress[]
+  module      Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@map("lessons")
+}
+
+model Enrollment {
+  id         String           @id @default(uuid())
+  studentId  String
+  courseId   String
+  status     EnrollmentStatus @default(ACTIVE)
+  enrolledAt DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  course     Course           @relation(fields: [courseId], references: [id])
+  student    User             @relation(fields: [studentId], references: [id])
+  payment    Payment?
+
+  @@unique([studentId, courseId])
+  @@map("enrollments")
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  DROPPED
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  amount        Float
+  currency      String        @default("USD")
+  status        PaymentStatus @default(PENDING)
+  transactionId String?       @unique
+  studentId     String
+  courseId      String
+  enrollmentId  String        @unique
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  student    User       @relation(fields: [studentId], references: [id])
+  course     Course     @relation(fields: [courseId], references: [id])
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id])
+
+  @@map("payments")
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  comment   String?
+  studentId String
+  courseId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student User   @relation(fields: [studentId], references: [id])
+  course  Course @relation(fields: [courseId], references: [id])
+
+  @@unique([studentId, courseId])
+  @@map("reviews")
+}
+
+model LessonProgress {
+  id          String    @id @default(uuid())
+  studentId   String
+  lessonId    String
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  lesson      Lesson    @relation(fields: [lessonId], references: [id])
+  student     User      @relation(fields: [studentId], references: [id])
+
+  @@unique([studentId, lessonId])
+  @@map("lesson_progress")
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
 enum UserRole {
   SUPER_ADMIN
   ADMIN
@@ -17,89 +204,5 @@ enum UserRole {
 enum CourseStatus {
   DRAFT
   PUBLISHED
-}
-
-model User {
-  id          String           @id @default(uuid())
-  email       String           @unique
-  password    String
-  firstName   String
-  lastName    String
-  role        UserRole         @default(STUDENT)
-  courses     Course[]         @relation("InstructorCourses")
-  enrollments Enrollment[]
-  progress    LessonProgress[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  @@map("users")
-}
-
-model Course {
-  id           String       @id @default(uuid())
-  title        String
-  description  String?
-  thumbnail    String?
-  instructorId String
-  instructor   User         @relation("InstructorCourses", fields: [instructorId], references: [id])
-  status       CourseStatus @default(DRAFT)
-  modules      Module[]
-  enrollments  Enrollment[]
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-
-  @@map("courses")
-}
-
-model Module {
-  id        String   @id @default(uuid())
-  title     String
-  order     Int
-  courseId  String
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lessons   Lesson[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("modules")
-}
-
-model Lesson {
-  id        String           @id @default(uuid())
-  title     String
-  content   String?
-  videoUrl  String?
-  order     Int
-  moduleId  String
-  module    Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  progress  LessonProgress[]
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-
-  @@map("lessons")
-}
-
-model Enrollment {
-  id         String   @id @default(uuid())
-  studentId  String
-  student    User     @relation(fields: [studentId], references: [id])
-  courseId   String
-  course     Course   @relation(fields: [courseId], references: [id])
-  enrolledAt DateTime @default(now())
-
-  @@unique([studentId, courseId])
-  @@map("enrollments")
-}
-
-model LessonProgress {
-  id          String    @id @default(uuid())
-  studentId   String
-  student     User      @relation(fields: [studentId], references: [id])
-  lessonId    String
-  lesson      Lesson    @relation(fields: [lessonId], references: [id])
-  isCompleted Boolean   @default(false)
-  completedAt DateTime?
-
-  @@unique([studentId, lessonId])
-  @@map("lesson_progress")
+  ARCHIVED
 }

@@ -1,14 +1,17 @@
 import bcrypt from 'bcryptjs';
 import httpStatus from 'http-status';
 import jwt from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
 
 import ApiError from '../../common/utils/ApiError.js';
 import config from '../../config/index.js';
+import prisma from '../../config/prisma.js';
 
 import type {
   IAuthResponse,
   ILoginUser,
   IRegisterUser,
+  ITokenPayload,
 } from './auth.interface.js';
 import { authRepository } from './auth.repository.js';
 
@@ -49,6 +52,19 @@ export class AuthService {
       email: newUser.email,
       role: newUser.role,
     });
+
+    // Store refresh token in DB
+    const expiresAt = new Date();
+    expiresAt.setDate(
+      expiresAt.getDate() + parseInt(config.jwt_refresh_expires_in as string) ||
+        30
+    );
+
+    await authRepository.upsertRefreshToken(
+      newUser.id,
+      refreshToken,
+      expiresAt
+    );
 
     return {
       accessToken,
@@ -92,6 +108,15 @@ export class AuthService {
       role: user.role,
     });
 
+    // Store refresh token in DB
+    const expiresAt = new Date();
+    expiresAt.setDate(
+      expiresAt.getDate() +
+        (parseInt(config.jwt_refresh_expires_in as string) || 30)
+    );
+
+    await authRepository.upsertRefreshToken(user.id, refreshToken, expiresAt);
+
     return {
       accessToken,
       refreshToken,
@@ -106,20 +131,109 @@ export class AuthService {
   }
 
   /**
+   * Refresh access token using a valid refresh token
+   * @param token - Old refresh token
+   */
+  async refreshToken(token: string) {
+    // 1. Verify token
+    try {
+      jwt.verify(token, config.jwt_refresh_secret as string);
+    } catch {
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid refresh token');
+    }
+
+    // 2. Check if token exists in DB
+    const storedToken = await authRepository.findRefreshToken(token);
+    if (!storedToken || storedToken.expiresAt < new Date()) {
+      throw new ApiError(
+        httpStatus.UNAUTHORIZED,
+        'Refresh token expired or revoked'
+      );
+    }
+
+    // 3. Generate new pair
+    const { accessToken, refreshToken: newRefreshToken } = this.generateTokens({
+      id: storedToken.user.id,
+      email: storedToken.user.email,
+      role: storedToken.user.role,
+    });
+
+    // 4. Update DB (Token Rotation)
+    await authRepository.deleteRefreshToken(token);
+
+    const expiresAt = new Date();
+    expiresAt.setDate(
+      expiresAt.getDate() +
+        (parseInt(config.jwt_refresh_expires_in as string) || 30)
+    );
+
+    await authRepository.upsertRefreshToken(
+      storedToken.userId,
+      newRefreshToken,
+      expiresAt
+    );
+
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
+    };
+  }
+
+  /**
+   * Logout user by removing refresh token
+   * @param token - The refresh token to invalidate
+   */
+  async logout(token: string) {
+    const storedToken = await authRepository.findRefreshToken(token);
+    if (storedToken) {
+      await authRepository.deleteRefreshToken(token);
+    }
+  }
+
+  /**
+   * Get current authenticated user details
+   * @param userId - The user ID from decoded token
+   */
+  async getMe(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    return user;
+  }
+
+  /**
    * Helper to generate access and refresh tokens
    * @param payload - Data to encode in the tokens
    * @returns Generated tokens
    */
-  private generateTokens(payload: { id: string; email: string; role: string }) {
+  private generateTokens(payload: ITokenPayload) {
     const accessToken = jwt.sign(payload, config.jwt_access_secret as string, {
-      expiresIn: config.jwt_access_expires_in as any,
+      expiresIn: config.jwt_access_expires_in as NonNullable<
+        SignOptions['expiresIn']
+      >,
     });
 
     const refreshToken = jwt.sign(
       payload,
       config.jwt_refresh_secret as string,
       {
-        expiresIn: config.jwt_refresh_expires_in as any,
+        expiresIn: config.jwt_refresh_expires_in as NonNullable<
+          SignOptions['expiresIn']
+        >,
       }
     );
 

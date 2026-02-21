@@ -24,7 +24,19 @@ export const loginValidationSchema = z.object({
   }),
 });
 
+/**
+ * Zod schema for refresh token validation
+ */
+export const refreshTokenValidationSchema = z.object({
+  cookies: z.object({
+    refreshToken: z.string({
+      message: 'Refresh token must be a string',
+    }),
+  }),
+});
+
 export const AuthValidation = {
   registerValidationSchema,
   loginValidationSchema,
+  refreshTokenValidationSchema,
 };

@@ -8,10 +8,14 @@ import httpStatus from 'http-status';
 import swaggerUi from 'swagger-ui-express';
 
 import globalErrorHandler from './common/middlewares/globalErrorHandler.js';
+import requestLogger from './common/middlewares/requestLogger.js';
 import swaggerSpec from './config/swagger.js';
 import router from './routes/index.js';
 
 const app: Application = express();
+
+// Request Logger
+app.use(requestLogger);
 
 // Security Middlewares
 app.use(helmet());
@@ -19,8 +23,8 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 
 // Parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Rate Limiter
 const limiter = rateLimit({

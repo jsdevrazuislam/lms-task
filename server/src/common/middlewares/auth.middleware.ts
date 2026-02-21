@@ -4,13 +4,16 @@ import jwt from 'jsonwebtoken';
 import type { JwtPayload } from 'jsonwebtoken';
 
 import config from '../../config/index.js';
+import type { ITokenPayload } from '../../modules/auth/auth.interface.js';
 import type { TUserRole } from '../constants/roles.js';
 import ApiError from '../utils/ApiError.js';
 import catchAsync from '../utils/catchAsync.js';
 
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization;
+    const token =
+      req.cookies?.accessToken ||
+      req.headers.authorization?.replace('Bearer ', '');
 
     // Check if the token is present
     if (!token) {
@@ -41,7 +44,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     // Add decoded user to request
-    (req as any).user = decoded;
+    req.user = decoded as ITokenPayload;
     next();
   });
 };
