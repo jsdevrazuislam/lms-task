@@ -63,21 +63,21 @@ export const CourseCurriculum = ({
                     className="flex items-center justify-between px-4 py-3 hover:bg-muted/20 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      {item.free ? (
+                      {item.isFree ? (
                         <Play className="w-4 h-4 text-primary shrink-0" />
                       ) : (
                         <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
                       )}
                       <span
                         className={`text-sm ${
-                          item.free
+                          item.isFree
                             ? "text-primary font-medium"
                             : "text-foreground"
                         }`}
                       >
                         {item.title}
                       </span>
-                      {item.free && (
+                      {item.isFree && (
                         <span className="badge-success text-[10px]">
                           Preview
                         </span>
