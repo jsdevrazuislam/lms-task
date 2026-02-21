@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import type { JwtPayload } from 'jsonwebtoken';
 
 import config from '../../config/index.js';
+import type { ITokenPayload } from '../../modules/auth/auth.interface.js';
 import type { TUserRole } from '../constants/roles.js';
 import ApiError from '../utils/ApiError.js';
 import catchAsync from '../utils/catchAsync.js';
@@ -43,7 +44,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     // Add decoded user to request
-    (req as any).user = decoded;
+    req.user = decoded as ITokenPayload;
     next();
   });
 };

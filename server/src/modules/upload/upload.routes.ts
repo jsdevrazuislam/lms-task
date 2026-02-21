@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 
 import authMiddleware from '../../common/middlewares/auth.middleware.js';
 
@@ -27,4 +27,4 @@ const router = express.Router();
  */
 router.get('/signature', authMiddleware(), UploadController.getSignature);
 
-export const UploadRoutes = router;
+export const UploadRoutes: Router = router;

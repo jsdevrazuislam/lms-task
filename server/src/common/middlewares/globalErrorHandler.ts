@@ -5,6 +5,7 @@ import type {
   Response,
 } from 'express';
 import httpStatus from 'http-status';
+import type { ZodIssue } from 'zod';
 
 import logger from '../utils/logger.js';
 
@@ -27,8 +28,8 @@ const globalErrorHandler: ErrorRequestHandler = (
   if (err?.name === 'ZodError') {
     statusCode = httpStatus.BAD_REQUEST;
     message = 'Validation Error';
-    errorSources = err.issues.map((issue: any) => ({
-      path: issue.path[issue.path.length - 1],
+    errorSources = err.issues.map((issue: ZodIssue) => ({
+      path: issue.path[issue.path.length - 1] as string | number,
       message: issue.message,
     }));
   } else if (err?.name === 'PrismaClientKnownRequestError') {

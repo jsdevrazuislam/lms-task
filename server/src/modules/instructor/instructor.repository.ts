@@ -6,6 +6,11 @@ import type {
   IInstructorStudent,
 } from './instructor.interface.js';
 
+/**
+ * Get instructor dashboard overview stats
+ * @param instructorId - ID of the instructor
+ * @returns Dashboard statistics including student count, revenue, and trends
+ */
 const getStats = async (
   instructorId: string
 ): Promise<IInstructorDashboardStats> => {
@@ -26,13 +31,12 @@ const getStats = async (
 
   const totalCourses = courses.length;
   const totalStudents = courses.reduce(
-    (acc: number, c: any) => acc + (c.enrollments?.length || 0),
+    (acc: number, c) => acc + (c.enrollments?.length || 0),
     0
   );
   const totalRevenue = courses.reduce(
-    (acc: number, c: any) =>
-      acc +
-      (c.payments?.reduce((sum: number, p: any) => sum + p.amount, 0) || 0),
+    (acc: number, c) =>
+      acc + (c.payments?.reduce((sum: number, p) => sum + p.amount, 0) || 0),
     0
   );
   const avgRating =
@@ -54,7 +58,7 @@ const getStats = async (
     _sum: { amount: true },
   });
 
-  const revenueTrend = dailyRevenue.map((d: any) => ({
+  const revenueTrend = dailyRevenue.map((d) => ({
     name: d.createdAt.toLocaleDateString('en-US', { weekday: 'short' }),
     revenue: d._sum.amount || 0,
   }));
@@ -68,6 +72,11 @@ const getStats = async (
   };
 };
 
+/**
+ * Get all courses for an instructor with performance metrics
+ * @param instructorId - ID of the instructor
+ * @returns List of course stats
+ */
 const getCourses = async (
   instructorId: string
 ): Promise<IInstructorCourseStats[]> => {
@@ -84,21 +93,23 @@ const getCourses = async (
     },
   });
 
-  return courses.map((c: any) => ({
+  return courses.map((c) => ({
     id: c.id,
     title: c.title,
     thumbnail: c.thumbnail,
     price: c.price,
     status: c.status,
     enrolledStudents: c._count.enrollments,
-    revenue: (c.payments as any[]).reduce(
-      (acc: number, p: any) => acc + p.amount,
-      0
-    ),
+    revenue: c.payments.reduce((acc: number, p) => acc + p.amount, 0),
     rating: c.rating,
   }));
 };
 
+/**
+ * Get roster of students enrolled in any of the instructor's courses
+ * @param instructorId - ID of the instructor
+ * @returns List of students with progress info
+ */
 const getStudents = async (
   instructorId: string
 ): Promise<IInstructorStudent[]> => {

@@ -1,11 +1,13 @@
+import type { User, RefreshToken } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import httpStatus from 'http-status';
 import jwt from 'jsonwebtoken';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 
 import ApiError from '../../common/utils/ApiError.js';
 import prisma from '../../config/prisma.js';
 
+import type { ITokenPayload } from './auth.interface.js';
 import { authRepository } from './auth.repository.js';
 import { AuthService } from './auth.service.js';
 
@@ -83,7 +85,7 @@ describe('AuthService', () => {
     });
 
     it('should throw error if user already exists', async () => {
-      mockedAuthRepository.findByEmail.mockResolvedValue({ id: '1' } as any);
+      mockedAuthRepository.findByEmail.mockResolvedValue({ id: '1' } as User);
 
       await expect(authService.register(userData)).rejects.toThrow(
         new ApiError(httpStatus.CONFLICT, 'User already exists with this email')
@@ -107,7 +109,7 @@ describe('AuthService', () => {
         lastName: 'Doe',
       };
 
-      mockedAuthRepository.findByEmail.mockResolvedValue(user as any);
+      mockedAuthRepository.findByEmail.mockResolvedValue(user as User);
       mockedBcrypt.compare.mockResolvedValue(true as never);
       mockedJwt.sign.mockReturnValue('token' as never);
 
@@ -129,7 +131,7 @@ describe('AuthService', () => {
     it('should throw error with incorrect password', async () => {
       mockedAuthRepository.findByEmail.mockResolvedValue({
         password: 'hashed',
-      } as any);
+      } as User);
       mockedBcrypt.compare.mockResolvedValue(false as never);
 
       await expect(authService.login(loginData)).rejects.toThrow(
@@ -143,7 +145,7 @@ describe('AuthService', () => {
       const mockToken = 'valid-token';
       mockedAuthRepository.findRefreshToken.mockResolvedValue({
         token: mockToken,
-      } as any);
+      } as RefreshToken & { user: User });
 
       await authService.logout(mockToken);
 
@@ -171,9 +173,11 @@ describe('AuthService', () => {
         user: { id: 'user-1', email: 'test@test.com', role: 'STUDENT' },
       };
 
-      mockedJwt.verify.mockReturnValue({ id: 'user-1' } as any);
+      (mockedJwt.verify as Mock).mockReturnValue({
+        id: 'user-1',
+      } as ITokenPayload);
       mockedAuthRepository.findRefreshToken.mockResolvedValue(
-        storedToken as any
+        storedToken as RefreshToken & { user: User }
       );
       mockedJwt.sign.mockReturnValue('new-token' as never);
 
@@ -197,7 +201,9 @@ describe('AuthService', () => {
     });
 
     it('should throw error if token not in DB', async () => {
-      mockedJwt.verify.mockReturnValue({ id: 'user-1' } as any);
+      (mockedJwt.verify as Mock).mockReturnValue({
+        id: 'user-1',
+      } as ITokenPayload);
       mockedAuthRepository.findRefreshToken.mockResolvedValue(null);
 
       await expect(authService.refreshToken('gone-token')).rejects.toThrow(
@@ -209,10 +215,12 @@ describe('AuthService', () => {
     });
 
     it('should throw error if token is expired in DB', async () => {
-      mockedJwt.verify.mockReturnValue({ id: 'user-1' } as any);
+      (mockedJwt.verify as Mock).mockReturnValue({
+        id: 'user-1',
+      } as ITokenPayload);
       const expiredToken = { expiresAt: new Date(Date.now() - 1000) };
       mockedAuthRepository.findRefreshToken.mockResolvedValue(
-        expiredToken as any
+        expiredToken as RefreshToken & { user: User }
       );
 
       await expect(authService.refreshToken('expired-token')).rejects.toThrow(
@@ -233,7 +241,11 @@ describe('AuthService', () => {
         lastName: 'B',
         password: 'secret',
       };
-      (prisma.user.findUnique as any).mockResolvedValue(user);
+      (
+        prisma.user.findUnique as unknown as {
+          mockResolvedValue: (v: User | null) => void;
+        }
+      ).mockResolvedValue(user as User);
 
       const result = await authService.getMe('1');
 
@@ -242,7 +254,11 @@ describe('AuthService', () => {
     });
 
     it('should throw error if user does not exist', async () => {
-      (prisma.user.findUnique as any).mockResolvedValue(null);
+      (
+        prisma.user.findUnique as unknown as {
+          mockResolvedValue: (v: User | null) => void;
+        }
+      ).mockResolvedValue(null);
 
       await expect(authService.getMe('none')).rejects.toThrow(
         new ApiError(httpStatus.NOT_FOUND, 'User not found')

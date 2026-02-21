@@ -34,15 +34,17 @@ const logger = winston.createLogger({
       filename: 'logs/error-%DATE%.log',
       datePattern: 'YYYY-MM-DD',
       level: 'error',
-      maxFiles: '14d',
+      maxFiles: '7d', // Reduced from 14d
       zippedArchive: true,
+      maxSize: '20m', // Added size limit
     }),
-    // Combined logs with rotation
+    // Combined logs with rotation (info and above)
     new winston.transports.DailyRotateFile({
       filename: 'logs/combined-%DATE%.log',
       datePattern: 'YYYY-MM-DD',
-      maxFiles: '14d',
+      maxFiles: '7d', // Reduced from 14d
       zippedArchive: true,
+      maxSize: '20m', // Added size limit
     }),
   ],
 });

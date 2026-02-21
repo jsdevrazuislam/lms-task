@@ -1,3 +1,10 @@
+import type {
+  Category,
+  Course,
+  Lesson,
+  Module,
+  UserRole,
+} from '@prisma/client';
 import { CourseStatus } from '@prisma/client';
 
 export interface ILesson {
@@ -51,4 +58,25 @@ export interface ICourseFilterRequest {
   sortOrder?: 'asc' | 'desc';
   level?: string;
   rating?: string;
+}
+
+export type TCourseWithRelations = Course & {
+  category: Category;
+  instructor: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: UserRole;
+  };
+  modules: (Module & {
+    lessons: Lesson[];
+  })[];
+  _count: {
+    enrollments: number;
+  };
+};
+
+export interface ICourseResponse extends Omit<TCourseWithRelations, '_count'> {
+  students: number;
 }

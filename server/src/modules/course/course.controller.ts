@@ -8,8 +8,13 @@ import sendResponse from '../../common/utils/sendResponse.js';
 import type { ICourseFilterRequest } from './course.interface.js';
 import { courseService } from './course.service.js';
 
+/**
+ * Create a new course (Instructor/Admin only)
+ * @param req - Express request with user info and course data in body
+ * @param res - Express response
+ */
 const createCourse = catchAsync(async (req: Request, res: Response) => {
-  const { id: userId } = (req as any).user;
+  const { id: userId } = req.user;
   const result = await courseService.createCourse(userId, req.body);
 
   sendResponse(res, {
@@ -20,8 +25,13 @@ const createCourse = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Get all courses with optional filters and pagination
+ * @param req - Express request with query filters
+ * @param res - Express response
+ */
 const getAllCourses = catchAsync(async (req: Request, res: Response) => {
-  const user = (req as any).user;
+  const user = req.user;
   const filters = pick(req.query, [
     'searchTerm',
     'minPrice',
@@ -45,9 +55,14 @@ const getAllCourses = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Get a specific course by ID
+ * @param req - Express request with course ID in params
+ * @param res - Express response
+ */
 const getCourseById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = (req as any).user;
+  const user = req.user;
   const result = await courseService.getCourseById(id as string, user);
 
   sendResponse(res, {
@@ -58,9 +73,14 @@ const getCourseById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Update course details (Owner/Instructor/Admin only)
+ * @param req - Express request with course ID in params and update data in body
+ * @param res - Express response
+ */
 const updateCourse = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { id: userId, role } = (req as any).user;
+  const { id: userId, role } = req.user;
   const result = await courseService.updateCourse(
     id as string,
     userId,
@@ -76,9 +96,14 @@ const updateCourse = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Soft delete a course (Owner/Instructor/Admin only)
+ * @param req - Express request with course ID in params
+ * @param res - Express response
+ */
 const deleteCourse = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { id: userId, role } = (req as any).user;
+  const { id: userId, role } = req.user;
   await courseService.deleteCourse(id as string, userId, role);
 
   sendResponse(res, {
@@ -100,9 +125,14 @@ const getPopularCourses = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Generate a secure streaming ticket for a lesson video
+ * @param req - Express request with course and lesson IDs in params
+ * @param res - Express response
+ */
 const getVideoTicket = catchAsync(async (req: Request, res: Response) => {
   const { id, lessonId } = req.params;
-  const user = (req as any).user;
+  const user = req.user;
 
   const result = await courseService.getVideoTicket(
     id as string,
@@ -118,9 +148,14 @@ const getVideoTicket = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Authorize key access for encrypted video content
+ * @param req - Express request with course and lesson IDs in params
+ * @param res - Express response
+ */
 const getVideoKey = catchAsync(async (req: Request, res: Response) => {
   const { id, lessonId } = req.params;
-  const user = (req as any).user;
+  const user = req.user;
 
   const result = await courseService.getVideoKey(
     id as string,
@@ -136,9 +171,14 @@ const getVideoKey = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Get recommended courses for the current student
+ * @param req - Express request with user info
+ * @param res - Express response
+ */
 const getRecommendedCourses = catchAsync(
   async (req: Request, res: Response) => {
-    const { id: studentId } = (req as any).user;
+    const { id: studentId } = req.user;
     const result = await courseService.getRecommendedCourses(studentId);
 
     sendResponse(res, {

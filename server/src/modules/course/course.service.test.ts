@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import cloudinary from '../../config/cloudinary.js';
 
+import type { TCourseWithRelations } from './course.interface.js';
 import { courseRepository } from './course.repository.js';
 import { courseService } from './course.service.js';
 
@@ -43,7 +44,9 @@ describe('CourseService', () => {
     });
 
     it('should generate a signed URL for an enrolled student', async () => {
-      vi.mocked(courseRepository.findById).mockResolvedValue(mockCourse as any);
+      vi.mocked(courseRepository.findById).mockResolvedValue(
+        mockCourse as unknown as TCourseWithRelations
+      );
       vi.mocked(courseRepository.isEnrolled).mockResolvedValue(true);
       vi.mocked(cloudinary.url).mockReturnValue('https://signed-url.m3u8');
 
@@ -64,7 +67,9 @@ describe('CourseService', () => {
     });
 
     it('should allow access to a free lesson for non-enrolled students', async () => {
-      vi.mocked(courseRepository.findById).mockResolvedValue(mockCourse as any);
+      vi.mocked(courseRepository.findById).mockResolvedValue(
+        mockCourse as unknown as TCourseWithRelations
+      );
       vi.mocked(courseRepository.isEnrolled).mockResolvedValue(false);
       vi.mocked(cloudinary.url).mockReturnValue('https://signed-url.m3u8');
 
@@ -78,7 +83,9 @@ describe('CourseService', () => {
     });
 
     it('should throw error if student is not enrolled in a paid lesson', async () => {
-      vi.mocked(courseRepository.findById).mockResolvedValue(mockCourse as any);
+      vi.mocked(courseRepository.findById).mockResolvedValue(
+        mockCourse as unknown as TCourseWithRelations
+      );
       vi.mocked(courseRepository.isEnrolled).mockResolvedValue(false);
 
       await expect(
@@ -98,7 +105,7 @@ describe('CourseService', () => {
         ],
       };
       vi.mocked(courseRepository.findById).mockResolvedValue(
-        courseNoVideo as any
+        courseNoVideo as unknown as TCourseWithRelations
       );
       vi.mocked(courseRepository.isEnrolled).mockResolvedValue(true);
 
@@ -137,11 +144,13 @@ describe('CourseService', () => {
         ],
         _count: { enrollments: 10 },
       };
-      vi.mocked(courseRepository.findById).mockResolvedValue(fullCourse as any);
+      vi.mocked(courseRepository.findById).mockResolvedValue(
+        fullCourse as unknown as TCourseWithRelations
+      );
 
       const result = await courseService.getCourseById('course-1', undefined);
 
-      const curriculumItems = result.curriculum[0].items;
+      const curriculumItems = result.curriculum[0]!.items;
       expect(curriculumItems[0]).toMatchObject({
         title: 'L1',
         contentType: 'video',

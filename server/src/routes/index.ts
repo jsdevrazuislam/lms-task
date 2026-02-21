@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { AdminRoutes } from '../modules/admin/admin.routes.js';
-import { authRoutes } from '../modules/auth/auth.routes.js';
+import { AuthRoutes } from '../modules/auth/auth.routes.js';
 import { CategoryRoutes } from '../modules/category/category.routes.js';
 import { CourseRoutes } from '../modules/course/course.routes.js';
 import { EnrollmentRoutes } from '../modules/enrollment/enrollment.routes.js';
@@ -19,7 +19,7 @@ const moduleRoutes = [
   },
   {
     path: '/auth',
-    route: authRoutes,
+    route: AuthRoutes,
   },
   {
     path: '/users',

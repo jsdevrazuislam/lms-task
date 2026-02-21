@@ -1,5 +1,5 @@
 import { UserRole } from '@prisma/client';
-import express from 'express';
+import express, { Router } from 'express';
 
 import auth from '../../common/middlewares/auth.middleware.js';
 
@@ -68,4 +68,4 @@ router.get(
   instructorController.getInstructorStudents
 );
 
-export const InstructorRoutes: express.Router = router;
+export const InstructorRoutes: Router = router;

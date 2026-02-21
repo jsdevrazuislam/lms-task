@@ -6,6 +6,11 @@ import sendResponse from '../../common/utils/sendResponse.js';
 
 import { adminService } from './admin.service.js';
 
+/**
+ * Get overall dashboard statistics for the admin panel
+ * @param req - Express request
+ * @param res - Express response
+ */
 const getDashboardStats = catchAsync(async (req: Request, res: Response) => {
   const result = await adminService.getDashboardStats();
 

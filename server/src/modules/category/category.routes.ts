@@ -1,5 +1,5 @@
 import { UserRole } from '@prisma/client';
-import express from 'express';
+import express, { Router } from 'express';
 
 import auth from '../../common/middlewares/auth.middleware.js';
 
@@ -117,4 +117,4 @@ router.delete(
   CategoryController.deleteCategory
 );
 
-export const CategoryRoutes = router;
+export const CategoryRoutes: Router = router;

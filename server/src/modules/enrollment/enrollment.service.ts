@@ -1,4 +1,4 @@
-import { EnrollmentStatus } from '@prisma/client';
+import { EnrollmentStatus, Prisma } from '@prisma/client';
 import httpStatus from 'http-status';
 
 import ApiError from '../../common/utils/ApiError.js';
@@ -6,6 +6,28 @@ import { courseRepository } from '../course/course.repository.js';
 
 import { enrollmentRepository } from './enrollment.repository.js';
 
+type TEnrollmentWithCourse = Prisma.EnrollmentGetPayload<{
+  include: {
+    course: {
+      include: {
+        instructor: true;
+        category: true;
+        modules: {
+          include: {
+            lessons: true;
+          };
+        };
+      };
+    };
+  };
+}>;
+
+/**
+ * Enroll a student in a course
+ * @param studentId - ID of the student
+ * @param courseId - ID of the course
+ * @returns The created enrollment
+ */
 const enrollInCourse = async (studentId: string, courseId: string) => {
   // Check if course exists
   const course = await courseRepository.findById(courseId);
@@ -30,12 +52,22 @@ const enrollInCourse = async (studentId: string, courseId: string) => {
   return await enrollmentRepository.create(studentId, courseId);
 };
 
+/**
+ * Get the enrollment status of a student for a specific course
+ * @param studentId - ID of the student
+ * @param courseId - ID of the course
+ * @returns The enrollment if found, otherwise null
+ */
 const getEnrollmentStatus = async (studentId: string, courseId: string) => {
   return await enrollmentRepository.findUnique(studentId, courseId);
 };
-
+/**
+ * Get all course enrollments for a specific student with progress metrics
+ * @param studentId - ID of the student
+ * @returns List of enrollments with progress and lesson counts
+ */
 const getStudentEnrollments = async (studentId: string) => {
-  const enrollments = await enrollmentRepository.findMany(
+  const enrollments = (await enrollmentRepository.findMany(
     { studentId },
     {
       course: {
@@ -56,11 +88,11 @@ const getStudentEnrollments = async (studentId: string) => {
       },
     },
     { enrolledAt: 'desc' }
-  );
+  )) as unknown as TEnrollmentWithCourse[];
 
   return await Promise.all(
-    enrollments.map(async (e: any) => {
-      const lessons = e.course.modules.flatMap((m: any) => m.lessons);
+    enrollments.map(async (e) => {
+      const lessons = e.course.modules.flatMap((m) => m.lessons);
       const totalLessons = lessons.length;
       const completedLessons = await enrollmentRepository.countLessonProgress({
         studentId,
@@ -85,8 +117,13 @@ const getStudentEnrollments = async (studentId: string) => {
   );
 };
 
+/**
+ * Get learning statistics and dashboard overview for a student
+ * @param studentId - ID of the student
+ * @returns Comprehensive statistics including course counts, progress, and details
+ */
 const getStudentStats = async (studentId: string) => {
-  const enrollments = await enrollmentRepository.findMany(
+  const enrollments = (await enrollmentRepository.findMany(
     { studentId },
     {
       course: {
@@ -100,7 +137,7 @@ const getStudentStats = async (studentId: string) => {
         },
       },
     }
-  );
+  )) as unknown as TEnrollmentWithCourse[];
 
   const totalEnrolled = enrollments.length;
   const completedCourses = enrollments.filter(
@@ -115,8 +152,11 @@ const getStudentStats = async (studentId: string) => {
   let totalCompletedLessons = 0;
 
   const enrollmentDetails = await Promise.all(
-    enrollments.map(async (e: any) => {
-      const lessons = e.course.modules.flatMap((m: any) => m.lessons);
+    enrollments.map(async (e) => {
+      if (!e.course) return null;
+
+      const course = e.course;
+      const lessons = course.modules?.flatMap((m) => m.lessons) || [];
       const lessonCount = lessons.length;
       totalLessonsAcrossAll += lessonCount;
 
@@ -146,14 +186,18 @@ const getStudentStats = async (studentId: string) => {
         }
       );
 
+      const instructor = course.instructor;
+
       return {
         courseId: e.courseId,
-        title: e.course.title,
-        courseTitle: e.course.title,
-        thumbnail: e.course.thumbnail,
+        title: course.title,
+        courseTitle: course.title,
+        thumbnail: course.thumbnail,
         enrolledAt: e.enrolledAt,
         lastActive: lastProgress?.completedAt || e.enrolledAt,
-        instructor: `${e.course.instructor.firstName} ${e.course.instructor.lastName}`,
+        instructor: instructor
+          ? `${instructor.firstName} ${instructor.lastName}`
+          : 'Unknown',
         progress:
           lessonCount === 0
             ? 0
@@ -165,6 +209,8 @@ const getStudentStats = async (studentId: string) => {
     })
   );
 
+  const filteredEnrollmentDetails = enrollmentDetails.filter((d) => d !== null);
+
   const overallProgress =
     totalLessonsAcrossAll === 0
       ? 0
@@ -175,10 +221,15 @@ const getStudentStats = async (studentId: string) => {
     completedCourses,
     activeCourses,
     overallProgress,
-    enrollmentDetails,
+    enrollmentDetails: filteredEnrollmentDetails,
   };
 };
 
+/**
+ * Get all earned certificates for a specific student
+ * @param studentId - ID of the student
+ * @returns List of completed enrollments with course details
+ */
 const getCertificates = async (studentId: string) => {
   return await enrollmentRepository.findMany(
     {

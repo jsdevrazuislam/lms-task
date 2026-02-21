@@ -6,8 +6,13 @@ import sendResponse from '../../common/utils/sendResponse.js';
 
 import { instructorService } from './instructor.service.js';
 
+/**
+ * Get instructor dashboard overview stats
+ * @param req - Express request with user info
+ * @param res - Express response
+ */
 const getDashboardStats = catchAsync(async (req: Request, res: Response) => {
-  const { id: userId } = (req as any).user;
+  const { id: userId } = req.user;
   const result = await instructorService.getDashboardStats(userId);
 
   sendResponse(res, {
@@ -18,8 +23,13 @@ const getDashboardStats = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Get all courses for the current instructor
+ * @param req - Express request with user info
+ * @param res - Express response
+ */
 const getInstructorCourses = catchAsync(async (req: Request, res: Response) => {
-  const { id: userId } = (req as any).user;
+  const { id: userId } = req.user;
   const result = await instructorService.getInstructorCourses(userId);
 
   sendResponse(res, {
@@ -30,9 +40,14 @@ const getInstructorCourses = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Get list of students enrolled in instructor's courses
+ * @param req - Express request with user info
+ * @param res - Express response
+ */
 const getInstructorStudents = catchAsync(
   async (req: Request, res: Response) => {
-    const { id: userId } = (req as any).user;
+    const { id: userId } = req.user;
     const result = await instructorService.getInstructorStudents(userId);
 
     sendResponse(res, {

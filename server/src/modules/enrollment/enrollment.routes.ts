@@ -1,5 +1,5 @@
 import { UserRole } from '@prisma/client';
-import express from 'express';
+import express, { Router } from 'express';
 
 import auth from '../../common/middlewares/auth.middleware.js';
 import validateRequest from '../../common/middlewares/validateRequest.js';
@@ -121,4 +121,4 @@ router.get(
   EnrollmentController.getEnrollmentStatus
 );
 
-export const EnrollmentRoutes = router;
+export const EnrollmentRoutes: Router = router;

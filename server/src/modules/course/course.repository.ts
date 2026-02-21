@@ -32,7 +32,7 @@ const create = async (instructorId: string, data: ICreateCourse) => {
             title: lesson.title,
             content: lesson.content ?? null,
             videoUrl: lesson.videoUrl ?? null,
-            contentType: (lesson as any).contentType ?? 'video',
+            contentType: lesson.contentType ?? 'video',
             duration: lesson.duration ?? null,
             isFree: lesson.isFree ?? false,
             order: lesson.order,
@@ -107,7 +107,9 @@ const findAll = async (filters: ICourseFilterRequest) => {
   }
 
   if (level && level !== 'All Levels' && level !== 'all') {
-    andConditions.push({ level: level.toUpperCase() as any });
+    andConditions.push({
+      level: level.toUpperCase() as Prisma.EnumCourseLevelFilter,
+    });
   }
 
   if (rating) {
@@ -192,7 +194,7 @@ const update = async (id: string, data: IUpdateCourse) => {
   const { modules, ...updateData } = data;
   return prisma.course.update({
     where: { id },
-    data: updateData as any, // Temporary bypass for complex Prisma types in partial updates
+    data: updateData as Prisma.CourseUpdateInput,
     include: {
       category: true,
     },

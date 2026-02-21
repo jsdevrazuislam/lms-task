@@ -1,4 +1,7 @@
 import type { User } from '@prisma/client';
+import type { JwtPayload } from 'jsonwebtoken';
+
+import type { TUserRole } from '../../common/constants/roles.js';
 
 /**
  * Interface for user registration request data
@@ -22,7 +25,7 @@ export interface IAuthResponse {
   user: {
     id: string;
     email: string;
-    role: string;
+    role: TUserRole;
     firstName: string;
     lastName: string;
   };
@@ -31,10 +34,18 @@ export interface IAuthResponse {
 /**
  * Payload for JWT tokens
  */
-export interface ITokenPayload {
+export interface ITokenPayload extends JwtPayload {
   id: string;
   email: string;
-  role: string;
+  role: TUserRole;
+}
+
+/**
+ * Response for refresh token logic
+ */
+export interface IRefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
 }
 
 /**

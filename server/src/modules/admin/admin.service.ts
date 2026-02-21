@@ -2,6 +2,10 @@ import { PaymentStatus, UserRole } from '@prisma/client';
 
 import prisma from '../../config/prisma.js';
 
+/**
+ * Calculate and retrieve comprehensive dashboard KPIs and trends
+ * @returns Dashboard statistics object
+ */
 const getDashboardStats = async () => {
   const [activeStudents, instructors, totalCourses, payments] =
     await Promise.all([

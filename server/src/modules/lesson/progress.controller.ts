@@ -9,7 +9,7 @@ import { ProgressService } from './progress.service.js';
 const toggleLessonCompletion = catchAsync(
   async (req: Request, res: Response) => {
     const { lessonId } = req.params;
-    const studentId = (req as any).user.id;
+    const studentId = req.user.id;
 
     const result = await ProgressService.toggleLessonCompletion(
       studentId,
@@ -27,7 +27,7 @@ const toggleLessonCompletion = catchAsync(
 
 const getCourseProgress = catchAsync(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const studentId = (req as any).user.id;
+  const studentId = req.user.id;
 
   const result = await ProgressService.getCourseProgress(
     studentId,

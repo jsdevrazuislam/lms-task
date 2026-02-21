@@ -1,3 +1,4 @@
+import type { Lesson } from '@prisma/client';
 import { CourseStatus, UserRole } from '@prisma/client';
 import httpStatus from 'http-status';
 
@@ -6,7 +7,9 @@ import cloudinary from '../../config/cloudinary.js';
 
 import type {
   ICourseFilterRequest,
+  ICourseResponse,
   ICreateCourse,
+  TCourseWithRelations,
   IUpdateCourse,
 } from './course.interface.js';
 import { courseRepository } from './course.repository.js';
@@ -24,7 +27,10 @@ const createCourse = async (instructorId: string, payload: ICreateCourse) => {
 const getAllCourses = async (
   user: { id: string; role: UserRole } | undefined,
   filters: ICourseFilterRequest
-) => {
+): Promise<{
+  meta: { page: number; limit: number; total: number; totalPage: number };
+  data: ICourseResponse[];
+}> => {
   const finalFilters: ICourseFilterRequest = { ...filters };
 
   // Role-based visibility logic
@@ -43,25 +49,24 @@ const getAllCourses = async (
     }
   }
 
-  const result = await courseRepository.findAll(finalFilters);
+  const { data, meta } = await courseRepository.findAll(finalFilters);
 
-  // Map _count.enrollments to students for frontend compatibility
-  result.data = result.data.map((course: any) => {
+  const mappedData = data.map((course) => {
     const { _count, ...rest } = course;
     return {
       ...rest,
       students: _count?.enrollments || 0,
-    };
+    } as ICourseResponse;
   });
 
-  return result;
+  return { meta, data: mappedData };
 };
 
 const getCourseById = async (
   id: string,
   user: { id: string; role: UserRole } | undefined
 ) => {
-  const course: any = await courseRepository.findById(id);
+  const course = (await courseRepository.findById(id)) as TCourseWithRelations;
 
   if (!course) {
     throw new ApiError(httpStatus.NOT_FOUND, 'Course not found');
@@ -89,7 +94,7 @@ const getCourseById = async (
 
   // Transform modules to curriculum format for frontend
   const curriculum = course.modules
-    ?.map((module: any) => ({
+    ?.map((module) => ({
       id: module.id,
       title: module.title,
       order: module.order,
@@ -97,7 +102,7 @@ const getCourseById = async (
       duration: module.duration || '0m',
       items:
         module.lessons
-          ?.map((lesson: any) => ({
+          ?.map((lesson) => ({
             id: lesson.id,
             title: lesson.title,
             order: lesson.order,
@@ -105,13 +110,13 @@ const getCourseById = async (
             free: lesson.isFree || false,
             contentType: lesson.contentType || 'video',
           }))
-          .sort((a: any, b: any) => a.order - b.order) || [],
+          .sort((a, b) => a.order - b.order) || [],
     }))
-    .sort((a: any, b: any) => a.order - b.order);
+    .sort((a, b) => a.order - b.order);
 
   const totalLessons =
     course.modules?.reduce(
-      (acc: number, mod: any) => acc + (mod.lessons?.length || 0),
+      (acc: number, mod) => acc + (mod.lessons?.length || 0),
       0
     ) || 0;
 
@@ -202,9 +207,9 @@ const getVideoTicket = async (
   const isAdmin =
     user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN;
 
-  let requestedLesson: any = null;
+  let requestedLesson: Lesson | null = null;
   for (const module of course.modules || []) {
-    requestedLesson = module.lessons.find((l: any) => l.id === lessonId);
+    requestedLesson = module.lessons.find((l) => l.id === lessonId) || null;
     if (requestedLesson) break;
   }
 
@@ -230,7 +235,7 @@ const getVideoTicket = async (
     if (parts.length < 2) throw new Error('Invalid video URL');
 
     // Remove version and extension: v12345/folder/publicId.mp4 -> folder/publicId
-    const pathAfterUpload = parts[parts.length - 1];
+    const pathAfterUpload = parts[parts.length - 1]!;
     const pathWithoutVersion = pathAfterUpload.replace(/^v\d+\//, '');
     const publicId = pathWithoutVersion.replace(/\.[^/.]+$/, '');
 
@@ -248,7 +253,7 @@ const getVideoTicket = async (
       url: signedUrl,
       expiresAt: new Date(Date.now() + 7200 * 1000),
     };
-  } catch (error: any) {
+  } catch (error) {
     console.error('Video Ticket Generation Error:', error);
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
@@ -277,10 +282,10 @@ const getVideoKey = async (
 
   if (!isEnrolled && !isOwner && !isAdmin) {
     // Check if lesson is free
-    let requestedLesson: any = null;
+    let requestedLesson: Lesson | null = null;
     if (course) {
       for (const module of course.modules || []) {
-        requestedLesson = module.lessons.find((l: any) => l.id === lessonId);
+        requestedLesson = module.lessons.find((l) => l.id === lessonId) || null;
         if (requestedLesson) break;
       }
     }

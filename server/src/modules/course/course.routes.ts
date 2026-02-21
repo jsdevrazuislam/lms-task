@@ -1,5 +1,5 @@
 import { UserRole } from '@prisma/client';
-import express from 'express';
+import express, { Router } from 'express';
 
 import auth from '../../common/middlewares/auth.middleware.js';
 import validateRequest from '../../common/middlewares/validateRequest.js';
@@ -320,4 +320,4 @@ router.get(
   courseController.getVideoKey
 );
 
-export const CourseRoutes: express.Router = router;
+export const CourseRoutes: Router = router;

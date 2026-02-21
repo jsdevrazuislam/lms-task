@@ -108,7 +108,7 @@ export class AuthController {
    * Get current user
    */
   getMe = catchAsync(async (req: Request, res: Response) => {
-    const { id } = (req as any).user;
+    const { id } = req.user;
     const result = await authService.getMe(id);
 
     sendResponse(res, {

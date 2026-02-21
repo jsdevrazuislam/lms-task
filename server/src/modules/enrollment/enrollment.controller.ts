@@ -6,9 +6,14 @@ import sendResponse from '../../common/utils/sendResponse.js';
 
 import { EnrollmentService } from './enrollment.service.js';
 
+/**
+ * Enroll a student in a course
+ * @param req - Express request with user info and courseId in body
+ * @param res - Express response
+ */
 const enrollInCourse = catchAsync(async (req: Request, res: Response) => {
   const { courseId } = req.body;
-  const studentId = (req as any).user.id;
+  const studentId = req.user.id;
 
   const result = await EnrollmentService.enrollInCourse(studentId, courseId);
 
@@ -20,9 +25,14 @@ const enrollInCourse = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Check if a student is enrolled in a specific course
+ * @param req - Express request with courseId in params
+ * @param res - Express response
+ */
 const getEnrollmentStatus = catchAsync(async (req: Request, res: Response) => {
   const { courseId } = req.params;
-  const studentId = (req as any).user.id;
+  const studentId = req.user.id;
 
   const result = await EnrollmentService.getEnrollmentStatus(
     studentId,
@@ -37,9 +47,14 @@ const getEnrollmentStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Get all course enrollments for the current student
+ * @param req - Express request with user info
+ * @param res - Express response
+ */
 const getStudentEnrollments = catchAsync(
   async (req: Request, res: Response) => {
-    const studentId = (req as any).user.id;
+    const studentId = req.user.id;
     const result = await EnrollmentService.getStudentEnrollments(studentId);
 
     sendResponse(res, {
@@ -51,8 +66,13 @@ const getStudentEnrollments = catchAsync(
   }
 );
 
+/**
+ * Get learning statistics for the current student
+ * @param req - Express request with user info
+ * @param res - Express response
+ */
 const getStudentStats = catchAsync(async (req: Request, res: Response) => {
-  const studentId = (req as any).user.id;
+  const studentId = req.user.id;
   const result = await EnrollmentService.getStudentStats(studentId);
 
   sendResponse(res, {
@@ -63,8 +83,13 @@ const getStudentStats = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Get all earned certificates for the current student
+ * @param req - Express request with user info
+ * @param res - Express response
+ */
 const getCertificates = catchAsync(async (req: Request, res: Response) => {
-  const studentId = (req as any).user.id;
+  const studentId = req.user.id;
   const result = await EnrollmentService.getCertificates(studentId);
 
   sendResponse(res, {

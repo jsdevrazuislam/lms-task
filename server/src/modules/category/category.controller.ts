@@ -6,6 +6,11 @@ import sendResponse from '../../common/utils/sendResponse.js';
 
 import { CategoryService } from './category.service.js';
 
+/**
+ * Get all available categories
+ * @param req - Express request
+ * @param res - Express response
+ */
 const getAllCategories = catchAsync(async (req: Request, res: Response) => {
   const result = await CategoryService.getAllCategories();
   sendResponse(res, {
@@ -16,6 +21,11 @@ const getAllCategories = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Create a new category (Admin only)
+ * @param req - Express request with category data in body
+ * @param res - Express response
+ */
 const createCategory = catchAsync(async (req: Request, res: Response) => {
   const result = await CategoryService.createCategory(req.body);
   sendResponse(res, {
@@ -26,6 +36,11 @@ const createCategory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Update a category (Admin only)
+ * @param req - Express request with category ID in params and update data in body
+ * @param res - Express response
+ */
 const updateCategory = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await CategoryService.updateCategory(id as string, req.body);
@@ -37,6 +52,11 @@ const updateCategory = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Delete a category (Admin only)
+ * @param req - Express request with category ID in params
+ * @param res - Express response
+ */
 const deleteCategory = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   await CategoryService.deleteCategory(id as string);

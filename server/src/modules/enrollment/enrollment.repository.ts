@@ -2,6 +2,12 @@ import { EnrollmentStatus, Prisma } from '@prisma/client';
 
 import prisma from '../../config/prisma.js';
 
+/**
+ * Create a new enrollment for a student in a course
+ * @param studentId - ID of the student
+ * @param courseId - ID of the course
+ * @returns The created enrollment with course and instructor info
+ */
 const create = async (studentId: string, courseId: string) => {
   return await prisma.$transaction(async (tx) => {
     return await tx.enrollment.create({
@@ -21,6 +27,12 @@ const create = async (studentId: string, courseId: string) => {
   });
 };
 
+/**
+ * Find a unique enrollment record
+ * @param studentId - ID of the student
+ * @param courseId - ID of the course
+ * @returns The enrollment with course and instructor info if found
+ */
 const findUnique = async (studentId: string, courseId: string) => {
   return prisma.enrollment.findUnique({
     where: {
@@ -39,6 +51,12 @@ const findUnique = async (studentId: string, courseId: string) => {
   });
 };
 
+/**
+ * Find multiple enrollments based on criteria
+ * @param where - Filtering criteria
+ * @param include - Related data to include
+ * @param orderBy - Sorting criteria
+ */
 const findMany = async (
   where: Prisma.EnrollmentWhereInput,
   include?: Prisma.EnrollmentInclude,
@@ -46,8 +64,8 @@ const findMany = async (
 ) => {
   return prisma.enrollment.findMany({
     where,
-    include: include as any,
-    orderBy: orderBy as any,
+    ...(include ? { include } : {}),
+    ...(orderBy ? { orderBy } : {}),
   });
 };
 
@@ -57,13 +75,18 @@ const countLessonProgress = async (where: Prisma.LessonProgressWhereInput) => {
   });
 };
 
+/**
+ * Find the first lesson progress record for a student in a course
+ * @param where - Filtering criteria
+ * @param orderBy - Sorting criteria
+ */
 const findFirstLessonProgress = async (
   where: Prisma.LessonProgressWhereInput,
   orderBy?: Prisma.LessonProgressOrderByWithRelationInput
 ) => {
   return prisma.lessonProgress.findFirst({
     where,
-    orderBy: orderBy as any,
+    ...(orderBy ? { orderBy } : {}),
   });
 };
 

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Router } from 'express';
 
 import { UserRole } from '../../common/constants/roles.js';
 import auth from '../../common/middlewares/auth.middleware.js';
@@ -134,4 +134,4 @@ router.get(
   authController.getMe
 );
 
-export const authRoutes: express.Router = router;
+export const AuthRoutes: Router = router;

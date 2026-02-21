@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import httpStatus from 'http-status';
 import jwt from 'jsonwebtoken';
+import type { SignOptions } from 'jsonwebtoken';
 
 import ApiError from '../../common/utils/ApiError.js';
 import config from '../../config/index.js';
@@ -221,14 +222,18 @@ export class AuthService {
    */
   private generateTokens(payload: ITokenPayload) {
     const accessToken = jwt.sign(payload, config.jwt_access_secret as string, {
-      expiresIn: config.jwt_access_expires_in as any,
+      expiresIn: config.jwt_access_expires_in as NonNullable<
+        SignOptions['expiresIn']
+      >,
     });
 
     const refreshToken = jwt.sign(
       payload,
       config.jwt_refresh_secret as string,
       {
-        expiresIn: config.jwt_refresh_expires_in as any,
+        expiresIn: config.jwt_refresh_expires_in as NonNullable<
+          SignOptions['expiresIn']
+        >,
       }
     );
 

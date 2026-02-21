@@ -13,7 +13,7 @@ const getSignature = async (req: Request, res: Response) => {
     const timestamp = Math.round(new Date().getTime() / 1000);
 
     // Base params for signature
-    const paramsToSign: any = {
+    const paramsToSign: Record<string, string | number> = {
       timestamp: timestamp,
       folder: folder,
     };
@@ -40,10 +40,11 @@ const getSignature = async (req: Request, res: Response) => {
         eager: paramsToSign.eager,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as Error;
     res.status(500).json({
       success: false,
-      message: error.message || 'Failed to generate signature',
+      message: err.message || 'Failed to generate signature',
     });
   }
 };
