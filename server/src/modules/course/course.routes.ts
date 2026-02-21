@@ -60,7 +60,7 @@ const router = express.Router();
  */
 router.post(
   '/',
-  auth(UserRole.INSTRUCTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  auth(UserRole.INSTRUCTOR, UserRole.ADMIN),
   validateRequest(CourseValidation.createCourseValidationSchema),
   courseController.createCourse
 );
@@ -109,23 +109,66 @@ router.post(
  *           type: string
  *       - in: query
  *         name: sortOrder
- *         schema:
- *           type: string
- *           enum: [asc, desc]
+ *         schema: { type: 'string', enum: [asc, desc] }
  *     responses:
  *       200:
  *         description: Courses fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: 'boolean' }
+ *                 data:
+ *                   type: array
+ *                   items: { $ref: '#/components/schemas/Course' }
+ *                 meta: { $ref: '#/components/schemas/Pagination' }
  */
-router.get(
-  '/',
-  auth(
-    UserRole.STUDENT,
-    UserRole.INSTRUCTOR,
-    UserRole.ADMIN,
-    UserRole.SUPER_ADMIN
-  ),
-  courseController.getAllCourses
-);
+router.get('/', courseController.getAllCourses);
+
+/**
+ * @swagger
+ * /courses/popular:
+ *   get:
+ *     summary: Get top 5 popular courses
+ *     tags: [Courses]
+ *     responses:
+ *       200:
+ *         description: Popular courses fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: 'boolean' }
+ *                 data:
+ *                   type: array
+ *                   items: { $ref: '#/components/schemas/Course' }
+ */
+router.get('/popular', courseController.getPopularCourses);
+
+/**
+ * @swagger
+ * /courses/recommended:
+ *   get:
+ *     summary: Get recommended courses for the current student
+ *     tags: [Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Recommended courses fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: 'boolean' }
+ *                 data:
+ *                   type: array
+ *                   items: { $ref: '#/components/schemas/Course' }
+ */
+router.get('/recommended', auth(), courseController.getRecommendedCourses);
 
 /**
  * @swagger
@@ -139,24 +182,21 @@ router.get(
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
+ *         schema: { type: 'string' }
  *     responses:
  *       200:
  *         description: Course fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: 'boolean' }
+ *                 data: { $ref: '#/components/schemas/Course' }
  *       404:
  *         description: Course not found
  */
-router.get(
-  '/:id',
-  auth(
-    UserRole.STUDENT,
-    UserRole.INSTRUCTOR,
-    UserRole.ADMIN,
-    UserRole.SUPER_ADMIN
-  ),
-  courseController.getCourseById
-);
+router.get('/:id', courseController.getCourseById);
 
 /**
  * @swagger
@@ -194,6 +234,13 @@ router.get(
  *     responses:
  *       200:
  *         description: Course updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success: { type: 'boolean' }
+ *                 data: { $ref: '#/components/schemas/Course' }
  *       403:
  *         description: Forbidden
  *       404:
@@ -232,6 +279,45 @@ router.delete(
   '/:id',
   auth(UserRole.INSTRUCTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   courseController.deleteCourse
+);
+
+/**
+ * @swagger
+ * /courses/{id}/lessons/{lessonId}/video-ticket:
+ *   get:
+ *     summary: Generate a secure streaming ticket for a lesson video
+ *     tags: [Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: lessonId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Streaming ticket generated successfully
+ *       403:
+ *         description: Forbidden - Not enrolled
+ *       404:
+ *         description: Course or Lesson not found
+ */
+router.get(
+  '/:id/lessons/:lessonId/video-ticket',
+  auth(),
+  courseController.getVideoTicket
+);
+
+router.get(
+  '/:id/lessons/:lessonId/video-key',
+  auth(),
+  courseController.getVideoKey
 );
 
 export const CourseRoutes: express.Router = router;

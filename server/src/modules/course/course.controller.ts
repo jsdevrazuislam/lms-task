@@ -89,10 +89,75 @@ const deleteCourse = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getPopularCourses = catchAsync(async (req: Request, res: Response) => {
+  const result = await courseService.getPopularCourses();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Popular courses fetched successfully',
+    data: result,
+  });
+});
+
+const getVideoTicket = catchAsync(async (req: Request, res: Response) => {
+  const { id, lessonId } = req.params;
+  const user = (req as any).user;
+
+  const result = await courseService.getVideoTicket(
+    id as string,
+    lessonId as string,
+    user
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Streaming ticket generated successfully',
+    data: result,
+  });
+});
+
+const getVideoKey = catchAsync(async (req: Request, res: Response) => {
+  const { id, lessonId } = req.params;
+  const user = (req as any).user;
+
+  const result = await courseService.getVideoKey(
+    id as string,
+    lessonId as string,
+    user
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Key access authorized',
+    data: result,
+  });
+});
+
+const getRecommendedCourses = catchAsync(
+  async (req: Request, res: Response) => {
+    const { id: studentId } = (req as any).user;
+    const result = await courseService.getRecommendedCourses(studentId);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Recommended courses fetched successfully',
+      data: result,
+    });
+  }
+);
+
 export const courseController = {
   createCourse,
   getAllCourses,
+  getPopularCourses,
+  getRecommendedCourses,
   getCourseById,
   updateCourse,
   deleteCourse,
+  getVideoTicket,
+  getVideoKey,
 };

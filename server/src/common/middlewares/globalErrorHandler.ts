@@ -6,6 +6,8 @@ import type {
 } from 'express';
 import httpStatus from 'http-status';
 
+import logger from '../utils/logger.js';
+
 const globalErrorHandler: ErrorRequestHandler = (
   err,
   req: Request,
@@ -46,6 +48,20 @@ const globalErrorHandler: ErrorRequestHandler = (
         message: err?.message,
       },
     ];
+  }
+
+  // Structured Logging
+  if (statusCode >= 500) {
+    logger.error(`${req.method} ${req.originalUrl} - Internal Server Error`, {
+      error: err,
+      path: req.originalUrl,
+      method: req.method,
+    });
+  } else {
+    logger.warn(`${req.method} ${req.originalUrl} - ${message}`, {
+      statusCode,
+      errorSources,
+    });
   }
 
   res.status(statusCode).json({
