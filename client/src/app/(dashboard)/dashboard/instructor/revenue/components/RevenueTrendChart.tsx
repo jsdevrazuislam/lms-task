@@ -55,21 +55,13 @@ const RevenueTrendChart = ({ data }: RevenueTrendChartProps) => {
       >
         <defs>
           <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop
-              offset="5%"
-              stopColor="hsl(var(--primary))"
-              stopOpacity={0.25}
-            />
-            <stop
-              offset="95%"
-              stopColor="hsl(var(--primary))"
-              stopOpacity={0}
-            />
+            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.25} />
+            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke="hsl(var(--border))"
+          stroke="var(--border)"
           vertical={false}
         />
         <XAxis
@@ -77,7 +69,7 @@ const RevenueTrendChart = ({ data }: RevenueTrendChartProps) => {
           tick={{
             fontSize: 11,
             fontWeight: 600,
-            fill: "hsl(var(--muted-foreground))",
+            fill: "var(--muted-foreground)",
           }}
           axisLine={false}
           tickLine={false}
@@ -90,7 +82,7 @@ const RevenueTrendChart = ({ data }: RevenueTrendChartProps) => {
           tick={{
             fontSize: 11,
             fontWeight: 600,
-            fill: "hsl(var(--muted-foreground))",
+            fill: "var(--muted-foreground)",
           }}
           axisLine={false}
           tickLine={false}
@@ -99,7 +91,7 @@ const RevenueTrendChart = ({ data }: RevenueTrendChartProps) => {
         <Tooltip
           content={<CustomTooltip />}
           cursor={{
-            stroke: "hsl(var(--primary))",
+            stroke: "var(--primary)",
             strokeWidth: 1,
             strokeDasharray: "4 4",
           }}
@@ -107,19 +99,19 @@ const RevenueTrendChart = ({ data }: RevenueTrendChartProps) => {
         <Area
           type="monotone"
           dataKey="revenue"
-          stroke="hsl(var(--primary))"
+          stroke="var(--primary)"
           strokeWidth={3}
           fill="url(#revenueGrad)"
           dot={{
             r: 4,
-            fill: "hsl(var(--background))",
-            stroke: "hsl(var(--primary))",
+            fill: "var(--background)",
+            stroke: "var(--primary)",
             strokeWidth: 2,
           }}
           activeDot={{
             r: 6,
-            fill: "hsl(var(--primary))",
-            stroke: "hsl(var(--background))",
+            fill: "var(--primary)",
+            stroke: "var(--background)",
             strokeWidth: 2,
           }}
         />

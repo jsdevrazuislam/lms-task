@@ -115,16 +115,6 @@ export const Navbar = () => {
                     <span className="text-sm font-medium">My Dashboard</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/dashboard/settings"
-                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-muted transition-colors text-muted-foreground"
-                  >
-                    <span className="text-sm font-medium">
-                      Account Settings
-                    </span>
-                  </Link>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-2 bg-border h-px -mx-2" />
                 <DropdownMenuItem
                   onClick={() => logout()}

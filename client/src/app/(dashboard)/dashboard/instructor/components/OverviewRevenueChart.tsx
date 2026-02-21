@@ -19,22 +19,14 @@ const OverviewRevenueChart = ({ data }: OverviewRevenueChartProps) => {
       <AreaChart data={data}>
         <defs>
           <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-            <stop
-              offset="5%"
-              stopColor="hsl(var(--primary))"
-              stopOpacity={0.15}
-            />
-            <stop
-              offset="95%"
-              stopColor="hsl(var(--primary))"
-              stopOpacity={0}
-            />
+            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.15} />
+            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid
           strokeDasharray="3 3"
           vertical={false}
-          stroke="hsl(var(--border))"
+          stroke="var(--border)"
           opacity={0.6}
         />
         <XAxis
@@ -42,7 +34,7 @@ const OverviewRevenueChart = ({ data }: OverviewRevenueChartProps) => {
           axisLine={false}
           tickLine={false}
           tick={{
-            fill: "hsl(var(--muted-foreground))",
+            fill: "var(--muted-foreground)",
             fontSize: 12,
             fontWeight: 500,
           }}
@@ -52,7 +44,7 @@ const OverviewRevenueChart = ({ data }: OverviewRevenueChartProps) => {
           axisLine={false}
           tickLine={false}
           tick={{
-            fill: "hsl(var(--muted-foreground))",
+            fill: "var(--muted-foreground)",
             fontSize: 12,
             fontWeight: 500,
           }}
@@ -60,8 +52,8 @@ const OverviewRevenueChart = ({ data }: OverviewRevenueChartProps) => {
         />
         <Tooltip
           contentStyle={{
-            background: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
+            background: "var(--card)",
+            border: "1px solid var(--border)",
             borderRadius: 16,
             fontSize: 12,
             boxShadow: "var(--shadow-elevated)",
@@ -71,7 +63,7 @@ const OverviewRevenueChart = ({ data }: OverviewRevenueChartProps) => {
         <Area
           type="monotone"
           dataKey="revenue"
-          stroke="hsl(var(--primary))"
+          stroke="var(--primary)"
           strokeWidth={3}
           fillOpacity={1}
           fill="url(#colorRevenue)"

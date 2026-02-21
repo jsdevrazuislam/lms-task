@@ -52,7 +52,7 @@ export const CourseFilters = ({
                   onChange={() => setSelectedLevel(l)}
                   className="w-4 h-4 accent-primary border-border text-primary focus:ring-primary/20 cursor-pointer"
                 />
-                <span className="text-sm text-foreground group-hover:text-primary transition-colors font-medium">
+                <span className="text-sm capitalize! text-foreground group-hover:text-primary transition-colors font-medium">
                   {l}
                 </span>
               </label>

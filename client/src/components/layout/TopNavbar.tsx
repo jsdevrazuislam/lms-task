@@ -1,21 +1,12 @@
-import {
-  Bell,
-  Sun,
-  Moon,
-  ChevronDown,
-  BookOpen,
-  Settings,
-  LogOut,
-} from "lucide-react";
-import Link from "next/link";
+import { Bell, Sun, Moon, ChevronDown, BookOpen, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
 import React from "react";
+import { MobileSidebar } from "@/components/layout/Sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -37,8 +28,17 @@ export function TopNavbar() {
 
   return (
     <header className="h-16 border-b border-border bg-card/50 backdrop-blur-xl px-4 flex items-center justify-between sticky top-0 z-30 shrink-0">
-      {/* Mobile menu trigger - handle via sidebar */}
-      <div className="sm:hidden flex items-center">
+      {/* Mobile menu trigger */}
+      <div className="md:hidden flex items-center gap-3">
+        <MobileSidebar
+          role={
+            (user?.role?.toLowerCase() as
+              | "student"
+              | "instructor"
+              | "admin"
+              | "super-admin") || "student"
+          }
+        />
         <div className="w-8 h-8 rounded-lg bg-primary-muted flex items-center justify-center">
           <BookOpen className="w-4 h-4 text-primary" />
         </div>
@@ -167,16 +167,6 @@ export function TopNavbar() {
                 {user?.email}
               </p>
             </div>
-            <DropdownMenuItem asChild>
-              <Link
-                href="/dashboard/settings"
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-muted transition-colors"
-              >
-                <Settings className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Account Settings</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="my-2 bg-border h-px -mx-2" />
             <DropdownMenuItem
               onClick={() => logout()}
               className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 transition-colors"

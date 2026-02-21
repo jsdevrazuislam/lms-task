@@ -144,7 +144,7 @@ const AdminAnalytics = () => {
                       <XAxis
                         type="number"
                         tick={{
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "var(--muted-foreground)",
                           fontSize: 11,
                         }}
                       />
@@ -153,7 +153,7 @@ const AdminAnalytics = () => {
                         type="category"
                         width={110}
                         tick={{
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "var(--muted-foreground)",
                           fontSize: 11,
                         }}
                       />
@@ -163,8 +163,8 @@ const AdminAnalytics = () => {
                           "Students",
                         ]}
                         contentStyle={{
-                          backgroundColor: "hsl(var(--background))",
-                          border: "1px solid hsl(var(--border))",
+                          backgroundColor: "var(--background)",
+                          border: "1px solid var(--border)",
                           borderRadius: "12px",
                           fontSize: 12,
                           boxShadow: "var(--shadow-lg)",
@@ -172,7 +172,7 @@ const AdminAnalytics = () => {
                       />
                       <Bar
                         dataKey="enrollments"
-                        fill="hsl(var(--primary))"
+                        fill="var(--primary)"
                         radius={[0, 6, 6, 0]}
                         barSize={24}
                       />
@@ -219,7 +219,7 @@ const AdminAnalytics = () => {
                           <Cell
                             key={i}
                             fill={pieColors[i % pieColors.length]}
-                            stroke="hsl(var(--background))"
+                            stroke="var(--background)"
                             strokeWidth={2}
                           />
                         ))}
@@ -230,8 +230,8 @@ const AdminAnalytics = () => {
                           "Students",
                         ]}
                         contentStyle={{
-                          backgroundColor: "hsl(var(--background))",
-                          border: "1px solid hsl(var(--border))",
+                          backgroundColor: "var(--background)",
+                          border: "1px solid var(--border)",
                           borderRadius: "12px",
                           fontSize: 12,
                           boxShadow: "var(--shadow-lg)",

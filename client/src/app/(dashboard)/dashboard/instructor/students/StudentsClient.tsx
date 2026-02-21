@@ -82,15 +82,15 @@ const ProgressBar = ({ value }: { value: number }) => (
   <div className="flex items-center gap-2.5 min-w-0">
     <div className="flex-1 bg-muted rounded-full h-1.5 overflow-hidden min-w-[60px]">
       <div
-        className="h-full rounded-full transition-all duration-500"
+        className={`h-full rounded-full transition-all duration-500 ${
+          value === 100
+            ? "bg-primary"
+            : value > 60
+              ? "bg-primary/70"
+              : "bg-primary/40"
+        }`}
         style={{
           width: `${value}%`,
-          background:
-            value === 100
-              ? "hsl(var(--primary))"
-              : value > 60
-                ? "hsl(var(--primary) / 0.7)"
-                : "hsl(var(--primary) / 0.4)",
         }}
       />
     </div>
@@ -204,7 +204,9 @@ const StudentsClient = () => {
     {
       header: "Progress",
       thClassName: "min-w-[150px]",
-      render: (student: Student) => <ProgressBar value={student.progress} />,
+      render: (student: Student) => (
+        <ProgressBar value={student.progress || 0} />
+      ),
     },
     {
       header: "Status",

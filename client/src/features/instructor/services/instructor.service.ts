@@ -6,6 +6,7 @@ export interface IInstructorDashboardStats {
   totalRevenue: number;
   totalCourses: number;
   revenueTrend: { name: string; revenue: number }[];
+  dailyTrend: { name: string; revenue: number }[];
 }
 
 export interface IInstructorCourseStats {

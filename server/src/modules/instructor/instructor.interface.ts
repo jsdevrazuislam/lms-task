@@ -3,7 +3,8 @@ export interface IInstructorDashboardStats {
   avgRating: number;
   totalRevenue: number;
   totalCourses: number;
-  revenueTrend: { name: string; revenue: number }[];
+  revenueTrend: { name: string; revenue: number }[]; // Keeping for backward compatibility (monthly)
+  dailyTrend: { name: string; revenue: number }[];
 }
 
 export interface IInstructorCourseStats {

@@ -134,20 +134,20 @@ const AdminDashboard = () => {
                         dataKey="date"
                         className="text-xs"
                         tick={{
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "var(--muted-foreground)",
                           fontSize: 11,
                         }}
                       />
                       <YAxis
                         tick={{
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "var(--muted-foreground)",
                           fontSize: 11,
                         }}
                       />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: "hsl(var(--background))",
-                          border: "1px solid hsl(var(--border))",
+                          backgroundColor: "var(--background)",
+                          border: "1px solid var(--border)",
                           borderRadius: "12px",
                           fontSize: 12,
                           boxShadow: "var(--shadow-lg)",
@@ -156,10 +156,10 @@ const AdminDashboard = () => {
                       <Line
                         type="monotone"
                         dataKey="students"
-                        stroke="hsl(var(--primary))"
+                        stroke="var(--primary)"
                         strokeWidth={3}
                         dot={{
-                          fill: "hsl(var(--primary))",
+                          fill: "var(--primary)",
                           r: 4,
                           strokeWidth: 2,
                           stroke: "#fff",
@@ -198,13 +198,13 @@ const AdminDashboard = () => {
                       <XAxis
                         dataKey="month"
                         tick={{
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "var(--muted-foreground)",
                           fontSize: 11,
                         }}
                       />
                       <YAxis
                         tick={{
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "var(--muted-foreground)",
                           fontSize: 11,
                         }}
                         tickFormatter={(v) => `$${v / 1000}k`}
@@ -215,8 +215,8 @@ const AdminDashboard = () => {
                           "Revenue",
                         ]}
                         contentStyle={{
-                          backgroundColor: "hsl(var(--background))",
-                          border: "1px solid hsl(var(--border))",
+                          backgroundColor: "var(--background)",
+                          border: "1px solid var(--border)",
                           borderRadius: "12px",
                           fontSize: 12,
                           boxShadow: "var(--shadow-lg)",
@@ -237,12 +237,12 @@ const AdminDashboard = () => {
                         >
                           <stop
                             offset="5%"
-                            stopColor="hsl(var(--primary))"
+                            stopColor="var(--primary)"
                             stopOpacity={0.8}
                           />
                           <stop
                             offset="95%"
-                            stopColor="hsl(var(--primary))"
+                            stopColor="var(--primary)"
                             stopOpacity={0.3}
                           />
                         </linearGradient>

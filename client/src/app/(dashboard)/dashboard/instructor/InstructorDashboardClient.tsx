@@ -39,7 +39,7 @@ export default function InstructorDashboardClient() {
   const { data: myCourses, isLoading: isCoursesLoading } =
     useInstructorCourses();
 
-  const revenueData = stats?.revenueTrend || [];
+  const revenueData = stats?.dailyTrend || [];
   const isLoading = isStatsLoading || isCoursesLoading;
 
   return (

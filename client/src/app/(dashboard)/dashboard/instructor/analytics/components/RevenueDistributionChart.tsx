@@ -56,7 +56,7 @@ const RevenueDistributionChart = ({ data }: RevenueDistributionChartProps) => {
       >
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke="hsl(var(--border))"
+          stroke="var(--border)"
           vertical={false}
         />
         <XAxis
@@ -64,7 +64,7 @@ const RevenueDistributionChart = ({ data }: RevenueDistributionChartProps) => {
           tick={{
             fontSize: 10,
             fontWeight: 600,
-            fill: "hsl(var(--muted-foreground))",
+            fill: "var(--muted-foreground)",
           }}
           axisLine={false}
           tickLine={false}
@@ -77,7 +77,7 @@ const RevenueDistributionChart = ({ data }: RevenueDistributionChartProps) => {
           tick={{
             fontSize: 10,
             fontWeight: 600,
-            fill: "hsl(var(--muted-foreground))",
+            fill: "var(--muted-foreground)",
           }}
           axisLine={false}
           tickLine={false}
@@ -85,11 +85,11 @@ const RevenueDistributionChart = ({ data }: RevenueDistributionChartProps) => {
         />
         <Tooltip
           content={<ChartTooltip />}
-          cursor={{ fill: "hsl(var(--accent)/0.5)" }}
+          cursor={{ fill: "var(--accent)" }}
         />
         <Bar dataKey="revenue" radius={[6, 6, 0, 0]}>
           {data.map((_, i) => (
-            <Cell key={i} fill={`hsl(var(--primary) / ${1 - i * 0.12})`} />
+            <Cell key={i} fill={`var(--primary)`} />
           ))}
         </Bar>
       </BarChart>

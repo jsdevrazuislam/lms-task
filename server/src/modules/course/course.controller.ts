@@ -42,6 +42,8 @@ const getAllCourses = catchAsync(async (req: Request, res: Response) => {
     'limit',
     'sortBy',
     'sortOrder',
+    'level',
+    'rating',
   ]) as ICourseFilterRequest;
 
   const result = await courseService.getAllCourses(user, filters);

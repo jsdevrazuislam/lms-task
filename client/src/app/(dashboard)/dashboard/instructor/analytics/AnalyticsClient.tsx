@@ -88,11 +88,10 @@ const AnalyticsClient = () => {
           const rate =
             courseStudents.length > 0
               ? Math.round(
-                  (courseStudents.filter(
-                    (s) => s.status.toLowerCase() === "completed",
-                  ).length /
-                    courseStudents.length) *
-                    100,
+                  courseStudents.reduce(
+                    (acc, s) => acc + (s.progress || 0),
+                    0,
+                  ) / courseStudents.length,
                 )
               : 0;
           return {
@@ -212,10 +211,9 @@ const AnalyticsClient = () => {
                   </div>
                   <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full transition-all duration-1000 ease-out"
+                      className="h-full rounded-full transition-all duration-1000 ease-out bg-primary"
                       style={{
                         width: `${item.rate}%`,
-                        background: `linear-gradient(90deg, hsl(var(--primary)/0.6), hsl(var(--primary)))`,
                       }}
                     />
                   </div>

@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { RoleGate } from "@/components/auth/RoleGate";
-import { Sidebar, MobileSidebar } from "@/components/layout/Sidebar";
+import { Sidebar } from "@/components/layout/Sidebar";
 import { TopNavbar } from "@/components/layout/TopNavbar";
 import { UserRole } from "@/features/auth/types";
 
@@ -26,7 +26,6 @@ export function DashboardLayout({ children, role }: DashboardLayoutProps) {
             <div className="max-w-7xl mx-auto">{children}</div>
           </main>
         </div>
-        <MobileSidebar role={roleSlug} />
       </div>
     </RoleGate>
   );

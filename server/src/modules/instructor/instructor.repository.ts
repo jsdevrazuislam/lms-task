@@ -44,24 +44,71 @@ const getStats = async (
       ? courses.reduce((acc, c) => acc + c.rating, 0) / totalCourses
       : 0;
 
-  // Simple revenue trend for last 7 days
-  const sevenDaysAgo = new Date();
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  // Revenue trends: Fetch all successful payments for the last year
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  oneYearAgo.setHours(0, 0, 0, 0);
 
-  const dailyRevenue = await prisma.payment.groupBy({
-    by: ['createdAt'],
+  const payments = await prisma.payment.findMany({
     where: {
       course: { instructorId },
       status: 'SUCCESS',
-      createdAt: { gte: sevenDaysAgo },
+      createdAt: { gte: oneYearAgo },
     },
-    _sum: { amount: true },
+    select: {
+      amount: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: 'asc' },
   });
 
-  const revenueTrend = dailyRevenue.map((d) => ({
-    name: d.createdAt.toLocaleDateString('en-US', { weekday: 'short' }),
-    revenue: d._sum.amount || 0,
-  }));
+  // Aggregate monthly trend (last 12 months)
+  const monthlyData: Record<string, { name: string; revenue: number }> = {};
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+    const name = d.toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric',
+    });
+    monthlyData[key] = { name, revenue: 0 };
+  }
+
+  payments.forEach((p) => {
+    const key = `${p.createdAt.getFullYear()}-${p.createdAt.getMonth()}`;
+    const entry = monthlyData[key];
+    if (entry) {
+      entry.revenue += p.amount;
+    }
+  });
+
+  const revenueTrend = Object.values(monthlyData);
+
+  // Aggregate daily trend (last 14 days)
+  const dailyData: Record<string, { name: string; revenue: number }> = {};
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const keyStr = d.toISOString().split('T')[0];
+    const name = d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    });
+    if (keyStr) dailyData[keyStr] = { name, revenue: 0 };
+  }
+
+  payments.forEach((p) => {
+    const keyStr = p.createdAt.toISOString().split('T')[0];
+    if (keyStr) {
+      const entry = dailyData[keyStr];
+      if (entry) {
+        entry.revenue += p.amount;
+      }
+    }
+  });
+
+  const dailyTrend = Object.values(dailyData);
 
   return {
     totalStudents,
@@ -69,6 +116,7 @@ const getStats = async (
     totalRevenue,
     totalCourses,
     revenueTrend,
+    dailyTrend,
   };
 };
 

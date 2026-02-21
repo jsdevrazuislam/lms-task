@@ -54,7 +54,7 @@ const EnrollmentGrowthChart = ({ data }: EnrollmentGrowthChartProps) => {
       >
         <CartesianGrid
           strokeDasharray="3 3"
-          stroke="hsl(var(--border))"
+          stroke="var(--border)"
           vertical={false}
         />
         <XAxis
@@ -62,7 +62,7 @@ const EnrollmentGrowthChart = ({ data }: EnrollmentGrowthChartProps) => {
           tick={{
             fontSize: 10,
             fontWeight: 600,
-            fill: "hsl(var(--muted-foreground))",
+            fill: "var(--muted-foreground)",
           }}
           axisLine={false}
           tickLine={false}
@@ -72,7 +72,7 @@ const EnrollmentGrowthChart = ({ data }: EnrollmentGrowthChartProps) => {
           tick={{
             fontSize: 10,
             fontWeight: 600,
-            fill: "hsl(var(--muted-foreground))",
+            fill: "var(--muted-foreground)",
           }}
           axisLine={false}
           tickLine={false}
@@ -82,18 +82,18 @@ const EnrollmentGrowthChart = ({ data }: EnrollmentGrowthChartProps) => {
         <Line
           type="monotone"
           dataKey="students"
-          stroke="hsl(var(--primary))"
+          stroke="var(--primary)"
           strokeWidth={3}
           dot={{
             r: 4,
-            fill: "hsl(var(--background))",
-            stroke: "hsl(var(--primary))",
+            fill: "var(--background)",
+            stroke: "var(--primary)",
             strokeWidth: 2,
           }}
           activeDot={{
             r: 6,
-            fill: "hsl(var(--primary))",
-            stroke: "hsl(var(--background))",
+            fill: "var(--primary)",
+            stroke: "var(--background)",
             strokeWidth: 2,
           }}
         />
