@@ -1,5 +1,7 @@
+import { Loader2 } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { AuthLayoutInner } from "@/app/(auth)/AuthLayoutInner";
 import { AuthSidePanel } from "@/app/(auth)/AuthSidePanel";
 import { LoginForm } from "./LoginForm";
@@ -34,7 +36,15 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <LoginForm />
+      <Suspense
+        fallback={
+          <div className="h-64 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        }
+      >
+        <LoginForm />
+      </Suspense>
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">

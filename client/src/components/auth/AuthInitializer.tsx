@@ -37,11 +37,11 @@ export function AuthInitializer({ children }: { children: React.ReactNode }) {
     }
 
     // Handle successful hydration
-    if (user) {
+    if (user?.data) {
       dispatch(
         setCredentials({
           user: user.data,
-          token: tokenUtils.getToken() || token,
+          accessToken: tokenUtils.getToken() || (token as string),
           remember: tokenUtils.shouldRemember(),
         }),
       );

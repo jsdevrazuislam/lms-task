@@ -14,7 +14,7 @@ import { ICourse, ICurriculumSection } from "@/features/course/types";
 
 interface CourseDetailClientProps {
   id: string;
-  initialData?: ICourse;
+  initialData?: ICourse | null;
 }
 
 export function CourseDetailClient({

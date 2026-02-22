@@ -1,6 +1,7 @@
-import { Lock, ArrowLeft } from "lucide-react";
+import { Lock, ArrowLeft, Loader2 } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { AuthLayoutInner } from "@/app/(auth)/AuthLayoutInner";
 import { AuthSidePanel } from "@/app/(auth)/AuthSidePanel";
 import { ResetPasswordForm } from "./ResetPasswordForm";
@@ -21,7 +22,15 @@ export default function ResetPasswordPage() {
         />
       }
     >
-      <ResetPasswordForm />
+      <Suspense
+        fallback={
+          <div className="h-64 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        }
+      >
+        <ResetPasswordForm />
+      </Suspense>
 
       <Link
         href="/login"
