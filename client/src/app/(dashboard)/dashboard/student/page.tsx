@@ -14,7 +14,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { StatCard } from "@/components/dashboard/StatCard";
-import { Skeleton } from "@/components/ui/skeleton";
+import { StatCardSkeleton, Skeleton } from "@/components/shared/SkeletonLoader";
 import { useRecommendedCourses } from "@/features/course/hooks/useRecommendedCourses";
 import { ICourse } from "@/features/course/types";
 import { IEnrollment } from "@/features/enrollment/enrollment.api";
@@ -65,10 +65,13 @@ export default function StudentDashboard() {
     isStatsLoading || isEnrollmentsLoading || isRecommendedLoading;
 
   const overallProgress = stats?.overallProgress || 0;
-  const completed = enrollments.filter((e) => e.status === "COMPLETED");
+  const completed = enrollments.filter(
+    (e: IEnrollment) => e.status === "COMPLETED",
+  );
 
   const continueLearning = stats?.enrollmentDetails?.find(
-    (e) => e.status === "ACTIVE",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => e.status === "ACTIVE",
   );
 
   const hour = new Date().getHours();
@@ -119,34 +122,36 @@ export default function StudentDashboard() {
 
       {/* ── Stat Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6 gap-4">
-        <StatCard
-          title="Enrolled"
-          value={stats?.totalEnrolled || 0}
-          icon={<BookOpen className="w-5 h-5" />}
-          color="bg-primary text-primary-foreground"
-          loading={loading}
-        />
-        <StatCard
-          title="Completed"
-          value={stats?.completedCourses || 0}
-          icon={<CheckCircle2 className="w-5 h-5 text-white" />}
-          color="bg-emerald-500"
-          loading={loading}
-        />
-        <StatCard
-          title="Active"
-          value={stats?.activeCourses || 0}
-          icon={<Clock className="w-5 h-5 text-white" />}
-          color="bg-amber-500"
-          loading={loading}
-        />
-        <StatCard
-          title="Overall %"
-          value={`${overallProgress}%`}
-          icon={<TrendingUp className="w-5 h-5 text-white" />}
-          color="bg-violet-500"
-          loading={loading}
-        />
+        {loading ? (
+          Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
+        ) : (
+          <>
+            <StatCard
+              title="Enrolled"
+              value={stats?.totalEnrolled || 0}
+              icon={<BookOpen className="w-5 h-5" />}
+              color="bg-primary text-primary-foreground"
+            />
+            <StatCard
+              title="Completed"
+              value={stats?.completedCourses || 0}
+              icon={<CheckCircle2 className="w-5 h-5 text-white" />}
+              color="bg-emerald-500"
+            />
+            <StatCard
+              title="Active"
+              value={stats?.activeCourses || 0}
+              icon={<Clock className="w-5 h-5 text-white" />}
+              color="bg-amber-500"
+            />
+            <StatCard
+              title="Overall %"
+              value={`${overallProgress}%`}
+              icon={<TrendingUp className="w-5 h-5 text-white" />}
+              color="bg-violet-500"
+            />
+          </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -250,7 +255,8 @@ export default function StudentDashboard() {
                       <ProgressBar
                         value={
                           stats?.enrollmentDetails?.find(
-                            (d) => d.courseId === e.courseId,
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            (d: any) => d.courseId === e.courseId,
                           )?.progress || 0
                         }
                         className="mt-1.5"
@@ -258,7 +264,8 @@ export default function StudentDashboard() {
                     </div>
                     <span className="text-sm font-bold text-primary shrink-0">
                       {stats?.enrollmentDetails?.find(
-                        (d) => d.courseId === e.courseId,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        (d: any) => d.courseId === e.courseId,
                       )?.progress || 0}
                       %
                     </span>

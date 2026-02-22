@@ -395,10 +395,6 @@
     }
   }
 
-  .shadow-md-theme {
-    box-shadow: var(--shadow-md);
-  }
-
   .shadow-lg-theme {
     box-shadow: var(--shadow-lg);
   }

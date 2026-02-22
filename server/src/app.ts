@@ -40,6 +40,15 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Application Routes
 app.use('/api/v1', router);
 
+// Health Check
+app.get('/health', (req: Request, res: Response) => {
+  res.status(httpStatus.OK).json({
+    status: 'UP',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
 // Root Route
 app.get('/', (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({

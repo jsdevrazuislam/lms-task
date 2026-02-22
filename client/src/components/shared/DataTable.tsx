@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { Skeleton } from "@/components/shared/SkeletonLoader";
 import { Button } from "@/components/ui/button";
 
-interface Column<T> {
+export interface Column<T> {
   header: string;
   accessor?: keyof T;
   render?: (item: T) => ReactNode;

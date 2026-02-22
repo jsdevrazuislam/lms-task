@@ -18,8 +18,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
+import { NavUserSkeleton } from "../shared/SkeletonLoader";
+
 export function TopNavbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
@@ -36,7 +38,7 @@ export function TopNavbar() {
               | "student"
               | "instructor"
               | "admin"
-              | "super-admin") || "student"
+              | "super_admin") || "student"
           }
         />
         <div className="w-8 h-8 rounded-lg bg-primary-muted flex items-center justify-center">
@@ -134,48 +136,52 @@ export function TopNavbar() {
 
         <div className="h-8 w-px bg-border mx-1" />
 
-        {/* User Profile Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 p-1 rounded-xl hover:bg-muted transition-all group outline-none">
-              <Avatar className="h-9 w-9 border-2 border-background shadow-sm ring-1 ring-border">
-                <AvatarImage src={user?.avatarUrl} alt={user?.firstName} />
-                <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs uppercase">
-                  {user ? `${user.firstName[0]}${user.lastName[0]}` : "CN"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="hidden lg:block text-left mr-1">
-                <p className="text-xs font-bold text-foreground leading-tight">
+        {/* User Profile Dropdown or Skeleton */}
+        {isLoading ? (
+          <NavUserSkeleton />
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 p-1 rounded-xl hover:bg-muted transition-all group outline-none">
+                <Avatar className="h-9 w-9 border-2 border-background shadow-sm ring-1 ring-border">
+                  <AvatarImage src={user?.avatarUrl} alt={user?.firstName} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs uppercase">
+                    {user ? `${user.firstName[0]}${user.lastName[0]}` : "CN"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden lg:block text-left mr-1">
+                  <p className="text-xs font-bold text-foreground leading-tight">
+                    {user?.firstName} {user?.lastName}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground leading-tight uppercase font-semibold mt-0.5">
+                    {user?.role.replace("_", " ")}
+                  </p>
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-64 p-2 rounded-2xl shadow-elevated border-border z-50"
+            >
+              <div className="px-3 py-4 flex flex-col gap-1 border-b border-border mb-2">
+                <p className="text-sm font-bold text-foreground">
                   {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-[10px] text-muted-foreground leading-tight uppercase font-semibold mt-0.5">
-                  {user?.role.replace("_", " ")}
+                <p className="text-xs text-muted-foreground truncate">
+                  {user?.email}
                 </p>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-64 p-2 rounded-2xl shadow-elevated border-border z-50"
-          >
-            <div className="px-3 py-4 flex flex-col gap-1 border-b border-border mb-2">
-              <p className="text-sm font-bold text-foreground">
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">
-                {user?.email}
-              </p>
-            </div>
-            <DropdownMenuItem
-              onClick={() => logout()}
-              className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="text-sm font-bold">Sign Out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <DropdownMenuItem
+                onClick={() => logout()}
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="text-sm font-bold">Sign Out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </header>
   );

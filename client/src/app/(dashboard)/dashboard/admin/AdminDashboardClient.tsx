@@ -22,9 +22,13 @@ import {
 } from "recharts";
 import { StatCard } from "@/components/dashboard/StatCard";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import {
+  StatCardSkeleton,
+  TableRowSkeleton,
+  Skeleton,
+} from "@/components/shared/SkeletonLoader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminDashboard } from "@/features/admin/hooks/useAdminDashboard";
 
 const AdminDashboard = () => {
@@ -76,39 +80,43 @@ const AdminDashboard = () => {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            title="Active Students"
-            value={data?.kpis.activeStudents ?? 0}
-            icon={<Users className="w-6 h-6" />}
-            loading={isLoading}
-            color="bg-accent-muted text-accent"
-          />
-          <StatCard
-            title="Instructors"
-            value={data?.kpis.instructors ?? 0}
-            icon={<GraduationCap className="w-6 h-6" />}
-            loading={isLoading}
-            color="bg-primary-muted text-primary"
-          />
-          <StatCard
-            title="Total Courses"
-            value={data?.kpis.totalCourses ?? 0}
-            icon={<BookOpen className="w-6 h-6" />}
-            loading={isLoading}
-            color="bg-secondary-muted text-secondary"
-          />
-          <StatCard
-            title="Total Revenue"
-            value={`$${((data?.kpis.totalRevenue ?? 0) / 1000).toFixed(1)}k`}
-            icon={<DollarSign className="w-6 h-6" />}
-            loading={isLoading}
-            color="bg-warning-muted text-warning"
-          />
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <StatCardSkeleton key={i} />
+            ))
+          ) : (
+            <>
+              <StatCard
+                title="Active Students"
+                value={data?.kpis.activeStudents ?? 0}
+                icon={<Users className="w-6 h-6" />}
+                color="bg-accent-muted text-accent"
+              />
+              <StatCard
+                title="Instructors"
+                value={data?.kpis.instructors ?? 0}
+                icon={<GraduationCap className="w-6 h-6" />}
+                color="bg-primary-muted text-primary"
+              />
+              <StatCard
+                title="Total Courses"
+                value={data?.kpis.totalCourses ?? 0}
+                icon={<BookOpen className="w-6 h-6" />}
+                color="bg-secondary-muted text-secondary"
+              />
+              <StatCard
+                title="Total Revenue"
+                value={`$${((data?.kpis.totalRevenue ?? 0) / 1000).toFixed(1)}k`}
+                icon={<DollarSign className="w-6 h-6" />}
+                color="bg-warning-muted text-warning"
+              />
+            </>
+          )}
         </div>
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="border-border shadow-md-theme overflow-hidden">
+          <Card className="border-border  overflow-hidden">
             <CardHeader className="pb-4 bg-muted/20 border-b border-border/50">
               <CardTitle className="text-lg font-bold">
                 Enrollment Growth (Last 10 Days)
@@ -117,7 +125,7 @@ const AdminDashboard = () => {
             <CardContent className="pt-6">
               <div className="h-72">
                 {isLoading ? (
-                  <Skeleton className="w-100% h-100%" />
+                  <Skeleton className="w-full h-full" />
                 ) : data?.enrollmentTrend.length === 0 ? (
                   <div className="h-full flex items-center justify-center text-muted-foreground">
                     No enrollment data available
@@ -173,7 +181,7 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-border shadow-md-theme overflow-hidden">
+          <Card className="border-border  overflow-hidden">
             <CardHeader className="pb-4 bg-muted/20 border-b border-border/50">
               <CardTitle className="text-lg font-bold">
                 Revenue Summary
@@ -182,7 +190,7 @@ const AdminDashboard = () => {
             <CardContent className="pt-6">
               <div className="h-72">
                 {isLoading ? (
-                  <Skeleton className="w-100% h-100%" />
+                  <Skeleton className="w-full h-full" />
                 ) : data?.revenueSummary.length === 0 ? (
                   <div className="h-full flex items-center justify-center text-muted-foreground">
                     No revenue data available
@@ -256,7 +264,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Top Courses */}
-        <Card className="border-border shadow-md-theme overflow-hidden">
+        <Card className="border-border  overflow-hidden">
           <CardHeader className="pb-4 bg-muted/20 border-b border-border/50">
             <CardTitle className="text-lg font-bold flex items-center gap-2">
               <Crown className="w-5 h-5 text-warning" />
@@ -267,14 +275,7 @@ const AdminDashboard = () => {
             <div className="divide-y divide-border">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-4 p-5">
-                    <Skeleton className="w-10 h-10 rounded-full" />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-4 w-1/3" />
-                      <Skeleton className="h-3 w-1/4" />
-                    </div>
-                    <Skeleton className="h-4 w-16" />
-                  </div>
+                  <TableRowSkeleton key={i} cols={3} />
                 ))
               ) : data?.topCourses.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground">

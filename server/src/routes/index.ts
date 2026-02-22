@@ -7,6 +7,7 @@ import { CourseRoutes } from '../modules/course/course.routes.js';
 import { EnrollmentRoutes } from '../modules/enrollment/enrollment.routes.js';
 import { InstructorRoutes } from '../modules/instructor/instructor.routes.js';
 import { ProgressRoutes } from '../modules/lesson/progress.routes.js';
+import { SuperAdminRoutes } from '../modules/super-admin/super-admin.routes.js';
 import { UploadRoutes } from '../modules/upload/upload.routes.js';
 import { UserRoutes } from '../modules/user/user.routes.js';
 
@@ -16,6 +17,10 @@ const moduleRoutes = [
   {
     path: '/admin',
     route: AdminRoutes,
+  },
+  {
+    path: '/super-admin',
+    route: SuperAdminRoutes,
   },
   {
     path: '/auth',

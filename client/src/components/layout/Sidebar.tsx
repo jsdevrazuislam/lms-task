@@ -11,8 +11,6 @@ import {
   TrendingUp,
   GraduationCap,
   BookMarked,
-  BarChart2,
-  ShieldCheck,
   Award,
   ChevronRight,
   ChevronLeft,
@@ -35,7 +33,7 @@ interface NavGroup {
 }
 
 const navGroups: Record<string, NavGroup[]> = {
-  "super-admin": [
+  super_admin: [
     {
       title: "Overview",
       items: [
@@ -56,15 +54,14 @@ const navGroups: Record<string, NavGroup[]> = {
       items: [
         { label: "Users", icon: Users, path: "/dashboard/super-admin/users" },
         {
-          label: "Instructors",
+          label: "Admins",
           icon: GraduationCap,
-          path: "/dashboard/super-admin/instructors",
+          path: "/dashboard/super-admin/admins",
         },
-        { label: "Courses", icon: BookMarked, path: "/courses" },
         {
-          label: "Revenue",
-          icon: BarChart2,
-          path: "/dashboard/super-admin/revenue",
+          label: "Courses",
+          icon: BookMarked,
+          path: "/dashboard/super-admin/courses",
         },
       ],
     },
@@ -75,11 +72,6 @@ const navGroups: Record<string, NavGroup[]> = {
           label: "Platform Settings",
           icon: Settings,
           path: "/dashboard/super-admin/settings",
-        },
-        {
-          label: "Security",
-          icon: ShieldCheck,
-          path: "/dashboard/super-admin/security",
         },
       ],
     },
@@ -195,18 +187,18 @@ const navGroups: Record<string, NavGroup[]> = {
 };
 
 interface SidebarProps {
-  role: "super-admin" | "admin" | "instructor" | "student";
+  role: "super_admin" | "admin" | "instructor" | "student";
 }
 
 const roleLabels: Record<string, string> = {
-  "super-admin": "Super Admin",
+  super_admin: "Super Admin",
   admin: "Administrator",
   instructor: "Instructor",
   student: "Student",
 };
 
 const roleColors: Record<string, string> = {
-  "super-admin": "badge-destructive",
+  super_admin: "badge-destructive",
   admin: "badge-accent",
   instructor: "badge-primary",
   student: "badge-success",
@@ -232,7 +224,7 @@ function SidebarNav({
   collapsed = false,
   onNavClick,
 }: {
-  role: "super-admin" | "admin" | "instructor" | "student";
+  role: "super_admin" | "admin" | "instructor" | "student";
   collapsed?: boolean;
   onNavClick?: () => void;
 }) {
@@ -326,7 +318,7 @@ function DesktopSidebar({ role }: SidebarProps) {
       <button
         onClick={() => setCollapsed(!collapsed)}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className="absolute top-[72px] -right-4 z-40 w-8 h-8 rounded-full bg-card border-2 border-border shadow-md-theme flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-all duration-200"
+        className="absolute top-[72px] -right-4 z-40 w-8 h-8 rounded-full bg-card border-2 border-border  flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-all duration-200"
       >
         {collapsed ? (
           <ChevronRight className="w-3.5 h-3.5" />
