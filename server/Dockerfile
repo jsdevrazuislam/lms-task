@@ -13,8 +13,6 @@ RUN npm install -g pnpm@10.28.0
 
 # Copy root workspace files
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-# Copy server package file
-COPY server/package.json ./server/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
