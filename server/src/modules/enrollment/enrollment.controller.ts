@@ -100,10 +100,33 @@ const getCertificates = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+/**
+ * Drop a course
+ * @param req - Express request with courseId in params
+ * @param res - Express response
+ */
+const dropCourse = catchAsync(async (req: Request, res: Response) => {
+  const { courseId } = req.params;
+  const studentId = req.user.id;
+
+  const result = await EnrollmentService.dropCourse(
+    studentId,
+    courseId as string
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Dropped course successfully',
+    data: result,
+  });
+});
+
 export const EnrollmentController = {
   enrollInCourse,
   getEnrollmentStatus,
   getStudentEnrollments,
   getStudentStats,
   getCertificates,
+  dropCourse,
 };

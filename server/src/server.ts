@@ -1,11 +1,17 @@
-import type { Server } from 'http';
+import { createServer, Server } from 'http';
 
 import app from './app.js';
 import logger from './common/utils/logger.js';
 import config from './config/index.js';
+import { initSocket } from './config/socket.js';
 
 async function main() {
-  const server: Server = app.listen(config.port, () => {
+  const httpServer = createServer(app);
+
+  // Initialize Socket.io
+  initSocket(httpServer);
+
+  const server: Server = httpServer.listen(config.port, () => {
     logger.info(
       `🚀 Server is running on port http://localhost:${config.port}`,
       {

@@ -7,18 +7,18 @@ import prisma from '../../config/prisma.js';
  * @returns Dashboard statistics object
  */
 const getDashboardStats = async () => {
-  const [activeStudents, instructors, totalCourses, payments] =
+  const [activeStudents, instructors, totalCourses, revenueAggregation] =
     await Promise.all([
       prisma.user.count({ where: { role: UserRole.STUDENT } }),
       prisma.user.count({ where: { role: UserRole.INSTRUCTOR } }),
       prisma.course.count({ where: { isDeleted: false } }),
-      prisma.payment.findMany({
+      prisma.payment.aggregate({
         where: { status: PaymentStatus.SUCCESS },
-        select: { amount: true },
+        _sum: { amount: true },
       }),
     ]);
 
-  const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0);
+  const totalRevenue = revenueAggregation._sum.amount || 0;
 
   // Enrollment Trend (Last 10 days)
   const tenDaysAgo = new Date();

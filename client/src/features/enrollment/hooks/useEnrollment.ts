@@ -19,6 +19,7 @@ export const useEnrollment = (courseId: string) => {
       queryClient.invalidateQueries({ queryKey: ["student-courses"] });
       queryClient.invalidateQueries({ queryKey: ["student-stats"] });
       queryClient.invalidateQueries({ queryKey: ["user-courses"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       toast.success("Successfully enrolled in the course!");
       router.push(`/dashboard/student/courses`);
     },

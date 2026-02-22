@@ -6,6 +6,7 @@ import {
   AuthResponse,
   LoginCredentials,
   RegisterData,
+  ResetPasswordData,
 } from "../services/auth.service";
 import {
   setCredentials,
@@ -67,13 +68,25 @@ export const useAuth = () => {
 
   const registerMutation = useMutation({
     mutationFn: (userData: RegisterData) => authService.register(userData),
-    onSuccess: (response: AuthResponse) => {
-      dispatch(setCredentials(response.data));
-      handleRedirect(response.data.user.role);
+    onSuccess: () => {
+      // Registration successful, but needs verification
+      router.push("/login?verify=check");
     },
     onError: (err: Error) => {
       dispatch(setError(err.message));
     },
+  });
+
+  const verifyEmailMutation = useMutation({
+    mutationFn: (token: string) => authService.verifyEmail(token),
+  });
+
+  const forgotPasswordMutation = useMutation({
+    mutationFn: (email: string) => authService.forgotPassword(email),
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: (data: ResetPasswordData) => authService.resetPassword(data),
   });
 
   const logout = async () => {
@@ -97,6 +110,12 @@ export const useAuth = () => {
     isLoggingIn: loginMutation.isPending,
     register: registerMutation.mutate,
     isRegistering: registerMutation.isPending,
+    verifyEmail: verifyEmailMutation.mutateAsync,
+    isVerifying: verifyEmailMutation.isPending,
+    forgotPassword: forgotPasswordMutation.mutateAsync,
+    isSendingReset: forgotPasswordMutation.isPending,
+    resetPassword: resetPasswordMutation.mutateAsync,
+    isResetting: resetPasswordMutation.isPending,
     logout,
   };
 };

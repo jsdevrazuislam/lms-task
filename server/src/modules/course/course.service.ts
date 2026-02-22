@@ -4,6 +4,7 @@ import httpStatus from 'http-status';
 
 import ApiError from '../../common/utils/ApiError.js';
 import cloudinary from '../../config/cloudinary.js';
+import prisma from '../../config/prisma.js';
 
 import type {
   ICourseFilterRequest,
@@ -21,7 +22,17 @@ const createCourse = async (instructorId: string, payload: ICreateCourse) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Category does not exist');
   }
 
-  return courseRepository.create(instructorId, payload);
+  const result = await courseRepository.create(instructorId, payload);
+
+  // Notify Admins (Real-time alert)
+  const { emitToAdmins, SocketEvent } = await import('../../config/socket.js');
+  emitToAdmins(SocketEvent.NOTIFICATION, {
+    title: 'New Course Submission',
+    message: `A new course "${payload.title}" has been created and is awaiting review.`,
+    type: 'INFO',
+  });
+
+  return result;
 };
 
 const getAllCourses = async (
@@ -51,7 +62,7 @@ const getAllCourses = async (
 
   const { data, meta } = await courseRepository.findAll(finalFilters);
 
-  const mappedData = data.map((course) => {
+  const mappedData = (data as TCourseWithRelations[]).map((course) => {
     const { _count, ...rest } = course;
     return {
       ...rest,
@@ -164,7 +175,31 @@ const updateCourse = async (
     }
   }
 
-  return courseRepository.update(id, payload);
+  const result = await courseRepository.update(id, payload);
+
+  // Notify Students if a new lesson might have been added
+  if (payload.modules && payload.modules.length > 0) {
+    const enrollments = await prisma.enrollment.findMany({
+      where: { courseId: id, status: 'ACTIVE' },
+      select: { studentId: true },
+    });
+
+    const { NotificationService } =
+      await import('../notification/notification.service.js');
+    const { NotificationType } =
+      await import('../notification/notification.interface.js');
+
+    for (const enrollment of enrollments) {
+      await NotificationService.createNotification({
+        userId: enrollment.studentId,
+        title: 'New Content Added',
+        message: `A new lesson has been added to your course: ${course.title}`,
+        type: NotificationType.INFO,
+      });
+    }
+  }
+
+  return result;
 };
 
 const deleteCourse = async (id: string, userId: string, role: UserRole) => {

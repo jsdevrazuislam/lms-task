@@ -12,6 +12,14 @@ export type IRegisterUser = Pick<
 >;
 
 /**
+ * Internal interface for creating a user with security tokens
+ */
+export interface ICreateUser extends IRegisterUser {
+  verificationToken?: string | null;
+  verificationTokenExpires?: Date | null;
+}
+
+/**
  * Interface for user login request data
  */
 export type ILoginUser = Pick<User, 'email' | 'password'>;
@@ -49,9 +57,16 @@ export interface IRefreshTokenResponse {
 }
 
 /**
- * Response for refresh token logic
+ * Forgot password request data
  */
-export interface IRefreshTokenResponse {
-  accessToken: string;
-  refreshToken: string;
+export interface IForgotPassword {
+  email: string;
+}
+
+/**
+ * Reset password request data
+ */
+export interface IResetPassword {
+  token: string;
+  password: string;
 }

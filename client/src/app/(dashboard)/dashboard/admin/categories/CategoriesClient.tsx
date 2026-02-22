@@ -100,10 +100,10 @@ const AdminCategories = () => {
     }
   };
 
-  const nameValue = form.watch("name");
   const autoSlug = () => {
     const currentSlug = form.getValues("slug");
     if (!currentSlug || currentSlug === "") {
+      const nameValue = form.getValues("name");
       form.setValue(
         "slug",
         nameValue

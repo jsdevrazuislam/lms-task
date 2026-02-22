@@ -77,9 +77,9 @@ const findAll = async (filters: ICourseFilterRequest) => {
     sortOrder = 'desc',
     level,
     rating,
+    cursor,
   } = filters;
 
-  const skip = (Number(page) - 1) * Number(limit);
   const take = Number(limit);
 
   const andConditions: Prisma.CourseWhereInput[] = [{ isDeleted: false }];
@@ -128,38 +128,53 @@ const findAll = async (filters: ICourseFilterRequest) => {
 
   const whereConditions: Prisma.CourseWhereInput = { AND: andConditions };
 
-  const [result, total] = await Promise.all([
-    prisma.course.findMany({
-      where: whereConditions,
-      skip,
-      take,
-      orderBy: { [sortBy]: sortOrder },
-      include: {
-        category: true,
-        instructor: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-          },
-        },
-        _count: {
-          select: { enrollments: true },
+  const queryOptions: Prisma.CourseFindManyArgs = {
+    where: whereConditions,
+    take: take + 1,
+    orderBy: { [sortBy]: sortOrder },
+    include: {
+      category: true,
+      instructor: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
         },
       },
-    }),
+      _count: {
+        select: { enrollments: true },
+      },
+    },
+  };
+
+  if (cursor) {
+    queryOptions.cursor = { id: cursor };
+    queryOptions.skip = 1;
+  } else {
+    queryOptions.skip = (Number(page) - 1) * Number(limit);
+  }
+
+  const [result, total] = await Promise.all([
+    prisma.course.findMany(queryOptions),
     prisma.course.count({ where: whereConditions }),
   ]);
+
+  const hasNextPage = result.length > take;
+  const data = hasNextPage ? result.slice(0, take) : result;
+  const nextCursor =
+    hasNextPage && data.length > 0 ? data[data.length - 1]!.id : null;
 
   return {
     meta: {
       page: Number(page),
-      limit: Number(limit),
+      limit: take,
       total,
       totalPage: Math.ceil(total / take),
+      nextCursor,
+      hasNextPage,
     },
-    data: result,
+    data,
   };
 };
 
@@ -202,9 +217,24 @@ const update = async (id: string, data: IUpdateCourse) => {
 };
 
 const softDelete = async (id: string) => {
-  return prisma.course.update({
-    where: { id },
-    data: { isDeleted: true },
+  return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    // Soft delete lessons first
+    await tx.lesson.updateMany({
+      where: { module: { courseId: id } },
+      data: { isDeleted: true },
+    });
+
+    // Soft delete modules
+    await tx.module.updateMany({
+      where: { courseId: id },
+      data: { isDeleted: true },
+    });
+
+    // Soft delete the course itself
+    return tx.course.update({
+      where: { id },
+      data: { isDeleted: true },
+    });
   });
 };
 

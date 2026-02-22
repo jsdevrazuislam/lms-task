@@ -4,6 +4,7 @@ import { Mail, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormInput } from "@/components/shared/FormInput";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import {
   forgotPasswordSchema,
   ForgotPasswordFormData,
@@ -11,20 +12,23 @@ import {
 
 export function ForgotPasswordForm() {
   const [isSent, setIsSent] = useState(false);
+  const { forgotPassword, isSendingReset, error: authError } = useAuth();
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
-    console.log("Resetting password for:", data);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSent(true);
+    try {
+      await forgotPassword(data.email);
+      setIsSent(true);
+    } catch {
+      // Error is handled by useAuth and set in auth store
+    }
   };
 
   if (isSent) {
@@ -53,6 +57,11 @@ export function ForgotPasswordForm() {
       <p className="text-muted-foreground mb-8">
         No worries, we&apos;ll send you reset instructions.
       </p>
+      {authError && (
+        <div className="p-3 rounded-lg bg-destructive-muted text-destructive text-sm font-medium border border-destructive/20 mb-4 animate-fade-in">
+          {authError}
+        </div>
+      )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <FormInput
           label="Email address"
@@ -64,12 +73,12 @@ export function ForgotPasswordForm() {
         />
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSendingReset}
           className="w-full py-3 px-6 rounded-lg font-semibold text-sm text-white flex items-center justify-center gap-2 transition-all hover:opacity-90 disabled:opacity-50"
           style={{ background: "var(--gradient-primary)" }}
         >
-          {isSubmitting ? "Sending..." : "Send reset link"}
-          {!isSubmitting && <ArrowRight className="w-4 h-4" />}
+          {isSendingReset ? "Sending..." : "Send reset link"}
+          {!isSendingReset && <ArrowRight className="w-4 h-4" />}
         </button>
       </form>
     </>

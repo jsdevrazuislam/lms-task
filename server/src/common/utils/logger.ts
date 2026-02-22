@@ -1,12 +1,30 @@
 import 'winston-daily-rotate-file';
 import winston from 'winston';
 
+import { getContextValue } from '../middlewares/context.middleware.js';
+
 const { combine, timestamp, printf, colorize, errors, json } = winston.format;
+
+// Format to inject context values like requestId and userId
+const injectContext = winston.format((info) => {
+  const requestId = getContextValue('requestId');
+  if (requestId) {
+    info.requestId = requestId;
+  }
+  const userId = getContextValue('userId');
+  if (userId) {
+    info.userId = userId;
+  }
+  return info;
+});
 
 // Custom format for console logging
 const consoleFormat = printf(
-  ({ level, message, timestamp, stack, ...metadata }) => {
-    return `${timestamp} [${level}]: ${stack || message} ${
+  ({ level, message, timestamp, stack, requestId, userId, ...metadata }) => {
+    const contextStr = [requestId, userId].filter(Boolean).join('|');
+    const formattedContext = contextStr ? ` [${contextStr}]` : '';
+
+    return `${timestamp}${formattedContext} [${level}]: ${stack || message} ${
       Object.keys(metadata).length ? JSON.stringify(metadata) : ''
     }`;
   }
@@ -15,6 +33,7 @@ const consoleFormat = printf(
 const logger = winston.createLogger({
   level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
   format: combine(
+    injectContext(),
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     errors({ stack: true }),
     json()

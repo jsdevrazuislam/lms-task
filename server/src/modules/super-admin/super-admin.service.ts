@@ -1,4 +1,4 @@
-import { CourseStatus, PaymentStatus, UserRole } from '@prisma/client';
+import { CourseStatus, PaymentStatus, UserRole, Prisma } from '@prisma/client';
 
 import prisma from '../../config/prisma.js';
 
@@ -17,19 +17,17 @@ const getPlatformStats = async () => {
     totalInstructors,
     totalAdmins,
     activeCourses,
-    payments,
+    revenueAggregation,
   ] = await Promise.all([
     prisma.user.count({ where: { role: UserRole.STUDENT } }),
     prisma.user.count({ where: { role: UserRole.INSTRUCTOR } }),
     prisma.user.count({ where: { role: UserRole.ADMIN } }),
     prisma.course.count({ where: { isDeleted: false, status: 'PUBLISHED' } }),
-    prisma.payment.findMany({
+    prisma.payment.aggregate({
       where: { status: PaymentStatus.SUCCESS },
-      select: { amount: true },
+      _sum: { amount: true },
     }),
   ]);
-
-  const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0);
 
   return {
     totalUsers: totalStudents + totalInstructors + totalAdmins,
@@ -37,7 +35,7 @@ const getPlatformStats = async () => {
     instructors: totalInstructors,
     admins: totalAdmins,
     activeCourses,
-    totalRevenue,
+    totalRevenue: revenueAggregation._sum.amount || 0,
   };
 };
 
@@ -89,33 +87,47 @@ const getRevenueTrend = async () => {
 /**
  * Get all admin users with pagination
  */
-const getAllAdmins = async (page = 1, limit = 10) => {
-  const skip = (page - 1) * limit;
+const getAllAdmins = async (page = 1, limit = 10, cursor?: string) => {
+  const take = Number(limit);
+  const skip = cursor ? 1 : (page - 1) * take;
+
+  const queryOptions: Prisma.UserFindManyArgs = {
+    where: { role: UserRole.ADMIN },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      createdAt: true,
+    },
+    take: take + 1,
+    orderBy: { createdAt: 'desc' },
+    skip,
+  };
+
+  if (cursor) {
+    queryOptions.cursor = { id: cursor };
+  }
 
   const [admins, total] = await Promise.all([
-    prisma.user.findMany({
-      where: { role: UserRole.ADMIN },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        createdAt: true,
-      },
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-    }),
+    prisma.user.findMany(queryOptions),
     prisma.user.count({ where: { role: UserRole.ADMIN } }),
   ]);
 
+  const hasNextPage = admins.length > take;
+  const data = hasNextPage ? admins.slice(0, take) : admins;
+  const nextCursor =
+    hasNextPage && data.length > 0 ? data[data.length - 1]!.id : null;
+
   return {
-    data: admins,
+    data,
     meta: {
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(total / take),
+      nextCursor,
+      hasNextPage,
     },
   };
 };
@@ -126,35 +138,50 @@ const getAllAdmins = async (page = 1, limit = 10) => {
 const getAllUsers = async (
   filters: { role?: UserRole },
   page = 1,
-  limit = 10
+  limit = 10,
+  cursor?: string
 ) => {
-  const skip = (page - 1) * limit;
+  const take = Number(limit);
+  const skip = cursor ? 1 : (page - 1) * take;
+
+  const queryOptions: Prisma.UserFindManyArgs = {
+    where: filters,
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      createdAt: true,
+    },
+    take: take + 1,
+    orderBy: { createdAt: 'desc' },
+    skip,
+  };
+
+  if (cursor) {
+    queryOptions.cursor = { id: cursor };
+  }
 
   const [users, total] = await Promise.all([
-    prisma.user.findMany({
-      where: filters,
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        role: true,
-        createdAt: true,
-      },
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-    }),
+    prisma.user.findMany(queryOptions),
     prisma.user.count({ where: filters }),
   ]);
 
+  const hasNextPage = users.length > take;
+  const data = hasNextPage ? users.slice(0, take) : users;
+  const nextCursor =
+    hasNextPage && data.length > 0 ? data[data.length - 1]!.id : null;
+
   return {
-    data: users,
+    data,
     meta: {
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(total / take),
+      nextCursor,
+      hasNextPage,
     },
   };
 };
@@ -162,34 +189,48 @@ const getAllUsers = async (
 /**
  * Get all courses with pagination
  */
-const getAllCourses = async (page = 1, limit = 10) => {
-  const skip = (page - 1) * limit;
+const getAllCourses = async (page = 1, limit = 10, cursor?: string) => {
+  const take = Number(limit);
+  const skip = cursor ? 1 : (page - 1) * take;
+
+  const queryOptions: Prisma.CourseFindManyArgs = {
+    where: { isDeleted: false },
+    include: {
+      instructor: {
+        select: { firstName: true, lastName: true },
+      },
+      _count: {
+        select: { enrollments: true },
+      },
+    },
+    take: take + 1,
+    orderBy: { createdAt: 'desc' },
+    skip,
+  };
+
+  if (cursor) {
+    queryOptions.cursor = { id: cursor };
+  }
 
   const [courses, total] = await Promise.all([
-    prisma.course.findMany({
-      where: { isDeleted: false },
-      include: {
-        instructor: {
-          select: { firstName: true, lastName: true },
-        },
-        _count: {
-          select: { enrollments: true },
-        },
-      },
-      skip,
-      take: limit,
-      orderBy: { createdAt: 'desc' },
-    }),
+    prisma.course.findMany(queryOptions),
     prisma.course.count({ where: { isDeleted: false } }),
   ]);
 
+  const hasNextPage = courses.length > take;
+  const data = hasNextPage ? courses.slice(0, take) : courses;
+  const nextCursor =
+    hasNextPage && data.length > 0 ? data[data.length - 1]!.id : null;
+
   return {
-    data: courses,
+    data,
     meta: {
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(total / take),
+      nextCursor,
+      hasNextPage,
     },
   };
 };

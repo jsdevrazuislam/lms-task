@@ -7,12 +7,16 @@ import helmet from 'helmet';
 import httpStatus from 'http-status';
 import swaggerUi from 'swagger-ui-express';
 
+import contextMiddleware from './common/middlewares/context.middleware.js';
 import globalErrorHandler from './common/middlewares/globalErrorHandler.js';
 import requestLogger from './common/middlewares/requestLogger.js';
 import swaggerSpec from './config/swagger.js';
 import router from './routes/index.js';
 
 const app: Application = express();
+
+// Context Middleware (MUST BE FIRST)
+app.use(contextMiddleware);
 
 // Request Logger
 app.use(requestLogger);

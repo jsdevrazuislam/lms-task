@@ -3,10 +3,17 @@ import { IUser } from "../types";
 
 export interface AuthResponse {
   success: boolean;
+  message: string;
   data: {
     user: IUser;
-    token: string;
+    accessToken: string;
   };
+}
+
+export interface GenericResponse {
+  success: boolean;
+  message: string;
+  data: null;
 }
 
 export interface LoginCredentials {
@@ -21,6 +28,11 @@ export interface RegisterData {
   lastName: string;
   company?: string;
   role?: string;
+}
+
+export interface ResetPasswordData {
+  token: string;
+  password?: string;
 }
 
 export const authService = {
@@ -48,6 +60,21 @@ export const authService = {
     data: { accessToken: string };
   }> {
     const response = await apiClient.post("/auth/refresh-token");
+    return response.data;
+  },
+
+  async verifyEmail(token: string): Promise<GenericResponse> {
+    const response = await apiClient.get(`/auth/verify-email?token=${token}`);
+    return response.data;
+  },
+
+  async forgotPassword(email: string): Promise<GenericResponse> {
+    const response = await apiClient.post("/auth/forgot-password", { email });
+    return response.data;
+  },
+
+  async resetPassword(data: ResetPasswordData): Promise<GenericResponse> {
+    const response = await apiClient.post("/auth/reset-password", data);
     return response.data;
   },
 };
