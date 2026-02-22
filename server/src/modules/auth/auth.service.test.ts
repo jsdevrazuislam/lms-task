@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 
 import ApiError from '../../common/utils/ApiError.js';
 import prisma from '../../config/prisma.js';
+import { EmailService } from '../email/email.service.js';
 
 import type { ITokenPayload } from './auth.interface.js';
 import { authRepository } from './auth.repository.js';
@@ -18,6 +19,15 @@ vi.mock('./auth.repository.js', () => ({
     upsertRefreshToken: vi.fn(),
     findRefreshToken: vi.fn(),
     deleteRefreshToken: vi.fn(),
+    findByVerificationToken: vi.fn(),
+    findByResetToken: vi.fn(),
+    updateUser: vi.fn(),
+  },
+}));
+
+vi.mock('../email/email.service.js', () => ({
+  EmailService: {
+    sendEmail: vi.fn(),
   },
 }));
 
@@ -71,6 +81,11 @@ describe('AuthService', () => {
         ...userData,
         password: 'hashed_password',
         role: 'STUDENT',
+        isVerified: false,
+        verificationToken: 'token',
+        verificationTokenExpires: new Date(),
+        resetToken: null,
+        resetTokenExpires: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -78,10 +93,9 @@ describe('AuthService', () => {
 
       const result = await authService.register(userData);
 
-      expect(result.user.email).toBe(userData.email);
-      expect(result.accessToken).toBe('token');
+      expect(result.message).toContain('Registration successful');
       expect(mockedAuthRepository.createUser).toHaveBeenCalled();
-      expect(mockedAuthRepository.upsertRefreshToken).toHaveBeenCalled();
+      expect(EmailService.sendEmail).toHaveBeenCalled();
     });
 
     it('should throw error if user already exists', async () => {
@@ -107,6 +121,13 @@ describe('AuthService', () => {
         role: 'STUDENT' as const,
         firstName: 'John',
         lastName: 'Doe',
+        isVerified: true,
+        verificationToken: null,
+        verificationTokenExpires: null,
+        resetToken: null,
+        resetTokenExpires: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       mockedAuthRepository.findByEmail.mockResolvedValue(user as User);
@@ -131,6 +152,7 @@ describe('AuthService', () => {
     it('should throw error with incorrect password', async () => {
       mockedAuthRepository.findByEmail.mockResolvedValue({
         password: 'hashed',
+        isVerified: true,
       } as User);
       mockedBcrypt.compare.mockResolvedValue(false as never);
 
@@ -170,7 +192,20 @@ describe('AuthService', () => {
         token: oldToken,
         userId: 'user-1',
         expiresAt: new Date(Date.now() + 10000),
-        user: { id: 'user-1', email: 'test@test.com', role: 'STUDENT' },
+        user: {
+          id: 'user-1',
+          email: 'test@test.com',
+          role: 'STUDENT',
+          firstName: 'Test',
+          lastName: 'User',
+          isVerified: true,
+          verificationToken: null,
+          verificationTokenExpires: null,
+          resetToken: null,
+          resetTokenExpires: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       };
 
       (mockedJwt.verify as Mock).mockReturnValue({
@@ -239,7 +274,14 @@ describe('AuthService', () => {
         email: 'a@b.com',
         firstName: 'A',
         lastName: 'B',
-        password: 'secret',
+        role: 'STUDENT',
+        isVerified: true,
+        verificationToken: null,
+        verificationTokenExpires: null,
+        resetToken: null,
+        resetTokenExpires: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
       (
         prisma.user.findUnique as unknown as {

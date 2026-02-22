@@ -18,6 +18,9 @@ vi.mock('../../config/prisma.js', () => ({
       update: vi.fn(),
       findUnique: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }));
 
@@ -43,7 +46,11 @@ describe('EnrollmentService', () => {
           ReturnType<typeof courseRepository.findById>
         >
       );
-      vi.mocked(enrollmentRepository.findUnique).mockResolvedValue(null);
+      const { default: prisma } = await import('../../config/prisma.js');
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        id: mockStudentId,
+        email: 'student@test.com',
+      } as unknown as Awaited<ReturnType<typeof prisma.user.findUnique>>);
       vi.mocked(enrollmentRepository.create).mockResolvedValue({
         ...mockEnrollment,
         course: mockCourse,
