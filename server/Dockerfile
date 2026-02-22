@@ -4,6 +4,10 @@ FROM node:20-alpine AS builder
 # Set working directory
 WORKDIR /app
 
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
+
 # Install build dependencies
 RUN apk add --no-cache libc6-compat
 RUN npm install -g pnpm@10.28.0
