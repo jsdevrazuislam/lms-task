@@ -27,6 +27,13 @@ export const useSuperAdminAnalytics = () => {
   });
 };
 
+export const useSuperAdminSettings = () => {
+  return useQuery({
+    queryKey: ["super-admin", "settings"],
+    queryFn: () => superAdminService.getSettings(),
+  });
+};
+
 export const useSuperAdminAdmins = (page = 1, limit = 10) => {
   return useQuery({
     queryKey: ["super-admin", "admins", page, limit],
@@ -138,6 +145,51 @@ export const useUpdateSettings = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to update settings",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useToggleUserStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      superAdminService.toggleUserStatus(id, isActive),
+    onSuccess: (_, { isActive }) => {
+      queryClient.invalidateQueries({ queryKey: ["super-admin", "users"] });
+      queryClient.invalidateQueries({ queryKey: ["super-admin", "admins"] });
+      toast({
+        title: "Success",
+        description: `User ${isActive ? "activated" : "deactivated"} successfully`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update user status",
+        variant: "destructive",
+      });
+    },
+  });
+};
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => superAdminService.deleteUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["super-admin", "users"] });
+      queryClient.invalidateQueries({ queryKey: ["super-admin", "admins"] });
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete user",
         variant: "destructive",
       });
     },

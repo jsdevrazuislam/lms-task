@@ -6,6 +6,7 @@ import {
   ISuperAdminUser,
   ISuperAdminCourse,
   IPaginatedResponse,
+  IPlatformSettings,
 } from "../types";
 
 export interface ISuperAdminAnalytics {
@@ -109,6 +110,28 @@ export const superAdminService = {
     const response = await apiClient.patch<{ data: unknown }>(
       "/super-admin/settings",
       body,
+    );
+    return response.data.data;
+  },
+
+  getSettings: async () => {
+    const response = await apiClient.get<{ data: IPlatformSettings }>(
+      "/super-admin/settings",
+    );
+    return response.data.data;
+  },
+
+  toggleUserStatus: async (id: string, isActive: boolean) => {
+    const response = await apiClient.patch<{ data: ISuperAdminUser }>(
+      `/super-admin/users/${id}/status`,
+      { isActive },
+    );
+    return response.data.data;
+  },
+
+  deleteUser: async (id: string) => {
+    const response = await apiClient.delete<{ data: null }>(
+      `/super-admin/users/${id}`,
     );
     return response.data.data;
   },

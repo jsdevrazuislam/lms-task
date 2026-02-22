@@ -3,9 +3,9 @@
 import {
   Shield,
   MoreVertical,
-  Edit2,
   Ban,
   Users as UsersIcon,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import { DataTable, Column } from "@/components/shared/DataTable";
@@ -19,7 +19,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CreateAdminModal } from "@/features/super-admin/components/CreateAdminModal";
-import { useSuperAdminAdmins } from "@/features/super-admin/hooks/useSuperAdmin";
+import {
+  useSuperAdminAdmins,
+  useToggleUserStatus,
+  useDeleteUser,
+} from "@/features/super-admin/hooks/useSuperAdmin";
 import { ISuperAdminUser } from "@/features/super-admin/types";
 
 export default function AdminManagementPage() {
@@ -30,6 +34,9 @@ export default function AdminManagementPage() {
     currentPage,
     pageSize,
   );
+
+  const { mutate: toggleStatus } = useToggleUserStatus();
+  const { mutate: deleteUser } = useDeleteUser();
 
   const columns: Column<ISuperAdminUser>[] = [
     {
@@ -65,12 +72,16 @@ export default function AdminManagementPage() {
     },
     {
       header: "Status",
-      render: () => (
+      render: (admin: ISuperAdminUser) => (
         <Badge
           variant="outline"
-          className="bg-emerald-50 text-emerald-600 border-emerald-100 font-bold"
+          className={`${
+            admin.isActive
+              ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+              : "bg-red-50 text-red-600 border-red-100"
+          } font-bold`}
         >
-          Active
+          {admin.isActive ? "Active" : "Inactive"}
         </Badge>
       ),
     },
@@ -78,7 +89,7 @@ export default function AdminManagementPage() {
       header: "Actions",
       thClassName: "text-right",
       className: "text-right",
-      render: () => (
+      render: (admin: ISuperAdminUser) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -93,11 +104,34 @@ export default function AdminManagementPage() {
             align="end"
             className="w-56 rounded-2xl shadow-xl animate-in fade-in slide-in-from-top-2"
           >
-            <DropdownMenuItem className="gap-3 py-3 rounded-xl">
-              <Edit2 className="w-4 h-4 text-primary" /> Edit Details
+            <DropdownMenuItem
+              className="gap-3 py-3 rounded-xl cursor-pointer"
+              onClick={() =>
+                toggleStatus({ id: admin.id, isActive: !admin.isActive })
+              }
+            >
+              {admin.isActive ? (
+                <>
+                  <Ban className="w-4 h-4" /> Deactivate Account
+                </>
+              ) : (
+                <>
+                  <Shield className="w-4 h-4 text-emerald-500" /> Activate
+                  Account
+                </>
+              )}
             </DropdownMenuItem>
-            <DropdownMenuItem className="gap-3 py-3 rounded-xl text-destructive focus:text-destructive">
-              <Ban className="w-4 h-4" /> Suspend Account
+            <DropdownMenuItem
+              className="gap-3 py-3 rounded-xl cursor-pointer text-destructive focus:text-destructive"
+              onClick={() => {
+                if (
+                  confirm("Are you sure you want to delete this admin forever?")
+                ) {
+                  deleteUser(admin.id);
+                }
+              }}
+            >
+              <Trash2 className="w-4 h-4" /> Delete Permanently
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -109,7 +143,7 @@ export default function AdminManagementPage() {
     <div className="space-y-8 animate-fade-in pb-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-extrabold tracking-tight bg-linear-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             Admin Management
           </h1>
           <p className="text-muted-foreground mt-2 text-lg">

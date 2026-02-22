@@ -1,8 +1,9 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save, Mail, Percent, Megaphone, ShieldAlert } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,28 +23,57 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { useUpdateSettings } from "@/features/super-admin/hooks/useSuperAdmin";
+import {
+  useUpdateSettings,
+  useSuperAdminSettings,
+} from "@/features/super-admin/hooks/useSuperAdmin";
 import {
   platformSettingsSchema,
   PlatformSettingsValues,
 } from "@/features/super-admin/schemas";
 
 export default function PlatformSettingsPage() {
+  const { data: settings, isLoading: isFetching } = useSuperAdminSettings();
   const { mutate: updateSettings, isPending: isUpdating } = useUpdateSettings();
+
   const form = useForm<PlatformSettingsValues>({
     resolver: zodResolver(platformSettingsSchema),
     defaultValues: {
       commissionPercentage: 20,
-      contactEmail: "admin@learnflow.com",
-      supportEmail: "support@learnflow.com",
-      globalBannerText: "Welcome to LearnFlow v2.0 - New features released!",
+      contactEmail: "",
+      supportEmail: "",
+      globalBannerText: "",
       isMaintenanceMode: false,
     },
   });
 
+  useEffect(() => {
+    if (settings) {
+      form.reset({
+        commissionPercentage: settings.commissionPercentage,
+        contactEmail: settings.contactEmail,
+        supportEmail: settings.supportEmail,
+        globalBannerText: settings.globalBannerText || "",
+        isMaintenanceMode: settings.isMaintenanceMode,
+      });
+    }
+  }, [settings, form]);
+
   const onSubmit = (values: PlatformSettingsValues) => {
     updateSettings(values);
   };
+
+  if (isFetching) {
+    return (
+      <div className="space-y-8 animate-pulse">
+        <div className="h-20 bg-muted/20 rounded-2xl" />
+        <div className="grid grid-cols-2 gap-6">
+          <div className="h-64 bg-muted/20 rounded-2xl" />
+          <div className="h-64 bg-muted/20 rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">

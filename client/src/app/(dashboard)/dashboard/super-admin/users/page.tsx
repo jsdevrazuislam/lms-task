@@ -6,12 +6,21 @@ import {
   Search,
   Filter,
   UserCog,
+  UserX,
+  UserCheck,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import { DataTable, Column } from "@/components/shared/DataTable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -20,7 +29,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useSuperAdminUsers } from "@/features/super-admin/hooks/useSuperAdmin";
+import {
+  useSuperAdminUsers,
+  useToggleUserStatus,
+  useDeleteUser,
+} from "@/features/super-admin/hooks/useSuperAdmin";
 import { ISuperAdminUser } from "@/features/super-admin/types";
 
 export default function UserDirectoryPage() {
@@ -33,6 +46,9 @@ export default function UserDirectoryPage() {
     page: currentPage,
     limit: pageSize,
   });
+
+  const { mutate: toggleStatus } = useToggleUserStatus();
+  const { mutate: deleteUser } = useDeleteUser();
 
   const columns: Column<ISuperAdminUser>[] = [
     {
@@ -63,13 +79,21 @@ export default function UserDirectoryPage() {
     },
     {
       header: "Status",
-      render: () => (
+      render: (user: ISuperAdminUser) => (
         <Badge
           variant="outline"
-          className="bg-emerald-50 text-emerald-600 border-emerald-100 font-medium space-x-1"
+          className={`${
+            user.isActive
+              ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+              : "bg-red-50 text-red-600 border-red-100"
+          } font-medium space-x-1`}
         >
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Active</span>
+          <div
+            className={`w-1.5 h-1.5 rounded-full ${
+              user.isActive ? "bg-emerald-500 animate-pulse" : "bg-red-500"
+            }`}
+          />
+          <span>{user.isActive ? "Active" : "Inactive"}</span>
         </Badge>
       ),
     },
@@ -85,14 +109,51 @@ export default function UserDirectoryPage() {
       header: "Actions",
       thClassName: "text-right",
       className: "text-right",
-      render: () => (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hover:bg-primary/10 hover:text-primary transition-colors"
-        >
-          <UserCog className="w-4 h-4" />
-        </Button>
+      render: (user: ISuperAdminUser) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hover:bg-primary/10 hover:text-primary transition-colors"
+            >
+              <UserCog className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48 rounded-xl p-2">
+            <DropdownMenuItem
+              className="rounded-lg gap-2 cursor-pointer font-medium"
+              onClick={() =>
+                toggleStatus({ id: user.id, isActive: !user.isActive })
+              }
+            >
+              {user.isActive ? (
+                <>
+                  <UserX className="w-4 h-4 text-orange-500" />
+                  Deactivate User
+                </>
+              ) : (
+                <>
+                  <UserCheck className="w-4 h-4 text-emerald-500" />
+                  Activate User
+                </>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="rounded-lg gap-2 cursor-pointer font-medium text-destructive focus:text-destructive"
+              onClick={() => {
+                if (
+                  confirm("Are you sure you want to delete this user forever?")
+                ) {
+                  deleteUser(user.id);
+                }
+              }}
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete Permanently
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ),
     },
   ];
@@ -101,7 +162,7 @@ export default function UserDirectoryPage() {
     <div className="space-y-8 animate-fade-in pb-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-extrabold tracking-tight bg-linear-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
             User Directory
           </h1>
           <p className="text-muted-foreground mt-2 text-lg">

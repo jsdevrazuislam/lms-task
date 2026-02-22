@@ -20,6 +20,7 @@ export interface ISuperAdminUser {
   firstName: string;
   lastName: string;
   role: UserRole;
+  isActive: boolean;
   createdAt: string;
 }
 
@@ -45,4 +46,11 @@ export interface IPaginatedResponse<T> {
     limit: number;
     totalPages: number;
   };
+}
+export interface IPlatformSettings {
+  commissionPercentage: number;
+  contactEmail: string;
+  supportEmail: string;
+  globalBannerText?: string;
+  isMaintenanceMode: boolean;
 }

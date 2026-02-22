@@ -192,36 +192,47 @@ export default function SuperAdminAnalyticsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {analyticsData?.topCourses?.map((course, idx) => (
-                  <TableRow
-                    key={course.id}
-                    className="hover:bg-muted/30 transition-colors"
-                  >
-                    <TableCell className="font-semibold py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs text-primary font-bold">
-                          #{idx + 1}
-                        </div>
-                        {course.title}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {course.instructor}
-                    </TableCell>
-                    <TableCell className="text-center font-medium">
-                      {course.enrollments}
-                    </TableCell>
-                    <TableCell className="text-right font-bold text-emerald-600">
-                      ${course.revenue.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1 text-emerald-600 font-bold text-sm">
-                        <TrendingUp className="w-4 h-4" />
-                        High
-                      </div>
+                {analyticsData?.topCourses?.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="h-32 text-center text-muted-foreground"
+                    >
+                      No course performance data available yet.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  analyticsData?.topCourses?.map((course, idx) => (
+                    <TableRow
+                      key={course.id}
+                      className="hover:bg-muted/30 transition-colors"
+                    >
+                      <TableCell className="font-semibold py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-xs text-primary font-bold">
+                            #{idx + 1}
+                          </div>
+                          {course.title}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {course.instructor}
+                      </TableCell>
+                      <TableCell className="text-center font-medium">
+                        {course.enrollments}
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-emerald-600">
+                        ${course.revenue.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1 text-emerald-600 font-bold text-sm">
+                          <TrendingUp className="w-4 h-4" />
+                          High
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>

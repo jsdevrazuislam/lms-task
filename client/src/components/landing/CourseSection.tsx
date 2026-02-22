@@ -75,6 +75,19 @@ export function CourseSection() {
               </div>
             ))}
           </div>
+        ) : popularCourses.length === 0 ? (
+          <div className="py-12 px-4 rounded-3xl border border-dashed border-border bg-muted/20 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
+              <Star className="w-8 h-8 text-muted-foreground/30" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2">
+              No popular courses yet
+            </h3>
+            <p className="text-muted-foreground max-w-md">
+              We&apos;re currently updating our catalog with top-rated learning
+              content. Check back soon for our most popular picks!
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {popularCourses.map((course: ICourse) => (

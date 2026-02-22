@@ -310,10 +310,71 @@ router.patch(
  *       200:
  *         description: Platform settings updated successfully
  */
+router.get(
+  '/settings',
+  auth(UserRole.SUPER_ADMIN),
+  superAdminController.getSettings
+);
+
 router.patch(
   '/settings',
   auth(UserRole.SUPER_ADMIN),
   superAdminController.updateSettings
+);
+
+/**
+ * @swagger
+ * /super-admin/users/{id}/status:
+ *   patch:
+ *     summary: Toggle user active status
+ *     tags: [SuperAdmin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [isActive]
+ *             properties:
+ *               isActive: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: User status updated successfully
+ */
+router.patch(
+  '/users/:id/status',
+  auth(UserRole.SUPER_ADMIN),
+  superAdminController.toggleUserStatus
+);
+
+/**
+ * @swagger
+ * /super-admin/users/{id}:
+ *   delete:
+ *     summary: Delete a user
+ *     tags: [SuperAdmin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ */
+router.delete(
+  '/users/:id',
+  auth(UserRole.SUPER_ADMIN),
+  superAdminController.deleteUser
 );
 
 export const SuperAdminRoutes: Router = router;

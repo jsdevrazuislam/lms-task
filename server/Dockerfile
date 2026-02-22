@@ -18,7 +18,7 @@ RUN pnpm install --no-frozen-lockfile
 
 COPY . .
 
-RUN pnpm prisma generate || npx prisma generate
+RUN npx prisma generate && npx prisma db push
 RUN pnpm run build
 RUN npx prisma migrate deploy
 

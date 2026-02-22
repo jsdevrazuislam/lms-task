@@ -63,6 +63,9 @@ export const useAuth = () => {
     },
     onError: (err: Error) => {
       dispatch(setError(err.message));
+      setTimeout(() => {
+        dispatch({ type: "auth/clearError" });
+      }, 8000);
     },
   });
 
@@ -74,6 +77,9 @@ export const useAuth = () => {
     },
     onError: (err: Error) => {
       dispatch(setError(err.message));
+      setTimeout(() => {
+        dispatch({ type: "auth/clearError" });
+      }, 8000);
     },
   });
 
@@ -97,8 +103,17 @@ export const useAuth = () => {
     } finally {
       dispatch(logoutAction());
       queryClient.clear();
-      router.push("/login");
+      // Use window.location.href to fully reload the page and clear any in-memory state
+      // This prevents browser "Back" navigation from showing authenticated content
+      window.location.href = "/login";
     }
+  };
+
+  const setErrorWithTimeout = (message: string, duration = 8000) => {
+    dispatch(setError(message));
+    setTimeout(() => {
+      dispatch({ type: "auth/clearError" });
+    }, duration);
   };
 
   return {
@@ -117,5 +132,6 @@ export const useAuth = () => {
     resetPassword: resetPasswordMutation.mutateAsync,
     isResetting: resetPasswordMutation.isPending,
     logout,
+    setError: setErrorWithTimeout,
   };
 };

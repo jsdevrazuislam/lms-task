@@ -1,5 +1,6 @@
 "use client";
 
+import { TrendingUp } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -22,6 +23,22 @@ export function RevenueAreaChart({ data, isLoading }: RevenueAreaChartProps) {
       <div className="h-[350px] w-full bg-muted/20 animate-pulse rounded-xl" />
     );
   }
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-[350px] w-full flex flex-col items-center justify-center border border-dashed border-border rounded-2xl bg-muted/5">
+        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+          <TrendingUp className="w-6 h-6 text-muted-foreground/40" />
+        </div>
+        <p className="text-sm font-semibold text-foreground">No revenue data</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Growth metrics will appear here once sales begin.
+        </p>
+      </div>
+    );
+  }
+
+  // Add TrendingUp import at top
 
   return (
     <div className="h-[350px] w-full">

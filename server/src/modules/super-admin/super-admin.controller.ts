@@ -133,6 +133,39 @@ const updateSettings = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSettings = catchAsync(async (req: Request, res: Response) => {
+  const result = await superAdminService.getSettings();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Platform settings fetched successfully',
+    data: result,
+  });
+});
+
+const toggleUserStatus = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const { isActive } = req.body;
+  const result = await superAdminService.toggleUserStatus(id, isActive);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
+    data: result,
+  });
+});
+
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  await superAdminService.deleteUser(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User deleted successfully',
+    data: null,
+  });
+});
+
 export const superAdminController = {
   getPlatformStats,
   getRevenueTrend,
@@ -143,5 +176,8 @@ export const superAdminController = {
   updateAdmin,
   overrideCourseStatus,
   updateSettings,
+  getSettings,
   getAnalyticsOverview,
+  toggleUserStatus,
+  deleteUser,
 };

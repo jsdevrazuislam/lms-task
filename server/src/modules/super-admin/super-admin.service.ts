@@ -152,6 +152,7 @@ const getAllUsers = async (
       firstName: true,
       lastName: true,
       role: true,
+      isActive: true,
       createdAt: true,
     },
     take: take + 1,
@@ -268,10 +269,37 @@ const overrideCourseStatus = async (id: string, status: string) => {
  * Update platform settings (mock persistence using metadata or separate table)
  * For now, we'll just mock the success as the schema doesn't have a Settings table yet.
  */
+/**
+ * Get platform settings
+ */
+const getSettings = async () => {
+  let settings = await prisma.settings.findFirst();
+  if (!settings) {
+    settings = await prisma.settings.create({
+      data: {
+        commissionPercentage: 20,
+        contactEmail: 'admin@learnflow.com',
+        supportEmail: 'support@learnflow.com',
+        globalBannerText: 'Welcome to LearnFlow v2.0 - New features released!',
+        isMaintenanceMode: false,
+      },
+    });
+  }
+  return settings;
+};
+
+/**
+ * Update platform settings
+ */
 const updateSettings = async (data: IPlatformSettingsData) => {
-  // In a real app, this would update a 'settings' table or a JSON config file.
-  console.log('Updating platform settings:', data);
-  return { success: true, ...data };
+  const settings = await prisma.settings.findFirst();
+  if (!settings) {
+    return prisma.settings.create({ data });
+  }
+  return prisma.settings.update({
+    where: { id: settings.id },
+    data,
+  });
 };
 
 /**
@@ -391,6 +419,30 @@ const updateAdmin = async (id: string, data: IAdminUpdateData) => {
   });
 };
 
+/**
+ * Toggle user active status
+ */
+const toggleUserStatus = async (id: string, isActive: boolean) => {
+  return prisma.user.update({
+    where: { id },
+    data: { isActive },
+    select: {
+      id: true,
+      email: true,
+      isActive: true,
+    },
+  });
+};
+
+/**
+ * Delete a user
+ */
+const deleteUser = async (id: string) => {
+  return prisma.user.delete({
+    where: { id },
+  });
+};
+
 export const superAdminService = {
   getPlatformStats,
   getRevenueTrend,
@@ -401,7 +453,10 @@ export const superAdminService = {
   updateAdmin,
   overrideCourseStatus,
   updateSettings,
+  getSettings,
   getTopCourses,
   getUserGrowth,
   getCategoryDistribution,
+  toggleUserStatus,
+  deleteUser,
 };

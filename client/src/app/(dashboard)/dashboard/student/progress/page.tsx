@@ -103,80 +103,103 @@ export default function StudentProgress() {
                 </tr>
               </thead>
               <tbody>
-                {isLoading
-                  ? [1, 2, 3].map((i) => (
-                      <tr key={i} className="border-b border-border">
-                        <td className="px-6 py-4">
-                          <Skeleton className="h-6 w-32" />
-                        </td>
-                        <td className="px-4 py-4">
-                          <Skeleton className="h-4 w-24" />
-                        </td>
-                        <td className="px-4 py-4">
-                          <Skeleton className="h-4 w-16" />
-                        </td>
-                        <td className="px-4 py-4">
-                          <Skeleton className="h-4 w-20" />
-                        </td>
-                        <td className="px-4 py-4">
-                          <Skeleton className="h-4 w-4" />
-                        </td>
-                      </tr>
-                    ))
-                  : enrollments.map((e) => (
-                      <tr
-                        key={e.courseId}
-                        className={`border-b border-border cursor-pointer transition-colors ${
-                          selected === e.courseId
-                            ? "bg-primary/5"
-                            : "hover:bg-muted/30"
-                        }`}
-                        onClick={() =>
-                          setSelected(
-                            selected === e.courseId ? null : e.courseId,
-                          )
-                        }
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="relative w-10 h-7 overflow-hidden rounded-lg shrink-0">
-                              <Image
-                                src={e.thumbnail || "/placeholder-course.jpg"}
-                                alt=""
-                                fill
-                                className="object-cover"
-                              />
-                            </div>
-                            <span className="font-semibold text-foreground line-clamp-1 text-xs">
-                              {e.title}
-                            </span>
+                {isLoading ? (
+                  [1, 2, 3].map((i) => (
+                    <tr key={i} className="border-b border-border">
+                      <td className="px-6 py-4">
+                        <Skeleton className="h-6 w-32" />
+                      </td>
+                      <td className="px-4 py-4">
+                        <Skeleton className="h-4 w-24" />
+                      </td>
+                      <td className="px-4 py-4">
+                        <Skeleton className="h-4 w-16" />
+                      </td>
+                      <td className="px-4 py-4">
+                        <Skeleton className="h-4 w-20" />
+                      </td>
+                      <td className="px-4 py-4">
+                        <Skeleton className="h-4 w-4" />
+                      </td>
+                    </tr>
+                  ))
+                ) : enrollments.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+                          <BookOpen className="w-6 h-6 text-muted-foreground/40" />
+                        </div>
+                        <p className="font-semibold text-foreground">
+                          No active enrollments
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1 max-w-[240px] mx-auto">
+                          You haven&apos;t started any courses yet. Explore our
+                          catalog to begin your learning journey.
+                        </p>
+                        <Link
+                          href="/courses"
+                          className="mt-4 text-xs font-bold text-primary hover:underline flex items-center gap-1"
+                        >
+                          Browse Courses <ChevronRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  enrollments.map((e) => (
+                    <tr
+                      key={e.courseId}
+                      className={`border-b border-border cursor-pointer transition-colors ${
+                        selected === e.courseId
+                          ? "bg-primary/5"
+                          : "hover:bg-muted/30"
+                      }`}
+                      onClick={() =>
+                        setSelected(selected === e.courseId ? null : e.courseId)
+                      }
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-10 h-7 overflow-hidden rounded-lg shrink-0">
+                            <Image
+                              src={e.thumbnail || "/placeholder-course.jpg"}
+                              alt=""
+                              fill
+                              className="object-cover"
+                            />
                           </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-2 min-w-24">
-                            <ProgressBar value={e.progress} />
-                            <span className="text-xs font-bold text-primary shrink-0">
-                              {e.progress}%
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <span
-                            className={`inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-full capitalize ${e.progress === 100 ? "bg-emerald-100 text-emerald-700" : "bg-primary/10 text-primary"}`}
-                          >
-                            {e.progress === 100 ? "Completed" : "Active"}
+                          <span className="font-semibold text-foreground line-clamp-1 text-xs">
+                            {e.title}
                           </span>
-                        </td>
-                        <td className="px-4 py-4 text-xs text-muted-foreground">
-                          {e.lastActive ? timeAgo(e.lastActive) : "—"}
-                        </td>
-                        <td className="px-4 py-4">
-                          <ChevronRight
-                            className={`w-4 h-4 text-muted-foreground transition-transform ${selected === e.courseId ? "rotate-90" : ""}`}
-                          />
-                        </td>
-                      </tr>
-                    ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-2 min-w-24">
+                          <ProgressBar value={e.progress} />
+                          <span className="text-xs font-bold text-primary shrink-0">
+                            {e.progress}%
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span
+                          className={`inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-full capitalize ${e.progress === 100 ? "bg-emerald-100 text-emerald-700" : "bg-primary/10 text-primary"}`}
+                        >
+                          {e.progress === 100 ? "Completed" : "Active"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-xs text-muted-foreground">
+                        {e.lastActive ? timeAgo(e.lastActive) : "—"}
+                      </td>
+                      <td className="px-4 py-4">
+                        <ChevronRight
+                          className={`w-4 h-4 text-muted-foreground transition-transform ${selected === e.courseId ? "rotate-90" : ""}`}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -129,10 +129,10 @@ const AdminAnalytics = () => {
               <div className="h-80">
                 {isLoading ? (
                   <Skeleton className="w-full h-full rounded-xl" />
-                ) : (
+                ) : data?.topCourses && data.topCourses.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
-                      data={data?.topCourses || []}
+                      data={data.topCourses}
                       layout="vertical"
                       margin={{ left: 10, right: 30 }}
                     >
@@ -178,6 +178,16 @@ const AdminAnalytics = () => {
                       />
                     </BarChart>
                   </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center p-6">
+                    <BookOpen className="w-10 h-10 text-muted-foreground/30 mb-2" />
+                    <p className="text-sm font-semibold text-foreground">
+                      No course data yet
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Course performance will show here once students enroll.
+                    </p>
+                  </div>
                 )}
               </div>
             </CardContent>
@@ -194,16 +204,14 @@ const AdminAnalytics = () => {
               <div className="h-80">
                 {isLoading ? (
                   <Skeleton className="w-full h-full rounded-xl" />
-                ) : (
+                ) : data?.topCourses && data.topCourses.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={
-                          data?.topCourses.map((c) => ({
-                            name: c.title,
-                            value: c.enrollments,
-                          })) || []
-                        }
+                        data={data.topCourses.map((c) => ({
+                          name: c.title,
+                          value: c.enrollments,
+                        }))}
                         cx="50%"
                         cy="50%"
                         innerRadius={65}
@@ -215,7 +223,7 @@ const AdminAnalytics = () => {
                         }
                         labelLine={false}
                       >
-                        {data?.topCourses.map((_, i) => (
+                        {data.topCourses.map((_, i) => (
                           <Cell
                             key={i}
                             fill={pieColors[i % pieColors.length]}
@@ -239,6 +247,16 @@ const AdminAnalytics = () => {
                       />
                     </PieChart>
                   </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center p-6">
+                    <TrendingUp className="w-10 h-10 text-muted-foreground/30 mb-2" />
+                    <p className="text-sm font-semibold text-foreground">
+                      No market share data
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Waiting for initial course sales.
+                    </p>
+                  </div>
                 )}
               </div>
               {/* Custom Legend */}

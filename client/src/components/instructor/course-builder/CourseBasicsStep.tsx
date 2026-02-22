@@ -103,7 +103,7 @@ export const CourseBasicsStep: React.FC<CourseBasicsStepProps> = ({
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="bg-background">
+                        <SelectTrigger className="bg-background w-full">
                           <SelectValue placeholder="Select Category" />
                         </SelectTrigger>
                       </FormControl>
@@ -126,7 +126,7 @@ export const CourseBasicsStep: React.FC<CourseBasicsStepProps> = ({
                 <div className="flex items-center justify-between mb-2">
                   <Label htmlFor="price">Sale Price ($)</Label>
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="isFree" className="text-xs">
+                    <Label htmlFor="isFree" className="text-xs cursor-pointer">
                       Free Course
                     </Label>
                     <Switch
@@ -135,8 +135,10 @@ export const CourseBasicsStep: React.FC<CourseBasicsStepProps> = ({
                       onCheckedChange={(val) => {
                         setValue("isFree", val);
                         if (val) {
-                          setValue("price", 0);
-                          setValue("originalPrice", 0);
+                          setValue("price", 0, { shouldValidate: true });
+                          setValue("originalPrice", 0, {
+                            shouldValidate: true,
+                          });
                         }
                       }}
                     />
@@ -147,6 +149,7 @@ export const CourseBasicsStep: React.FC<CourseBasicsStepProps> = ({
                   type="number"
                   disabled={isFree}
                   placeholder="0.00"
+                  step="0.01"
                   {...register("price", { valueAsNumber: true })}
                 />
                 {errors.price && (
@@ -199,7 +202,7 @@ export const CourseBasicsStep: React.FC<CourseBasicsStepProps> = ({
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="bg-background">
+                        <SelectTrigger className="bg-background w-full">
                           <SelectValue placeholder="Select Level" />
                         </SelectTrigger>
                       </FormControl>

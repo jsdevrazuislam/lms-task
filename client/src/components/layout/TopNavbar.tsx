@@ -182,7 +182,7 @@ export function TopNavbar() {
               </div>
               <DropdownMenuItem
                 onClick={() => logout()}
-                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl cursor-pointer text-destructive transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="text-sm font-bold">Sign Out</span>

@@ -82,6 +82,7 @@ describe('AuthService', () => {
         password: 'hashed_password',
         role: 'STUDENT',
         isVerified: false,
+        isActive: true,
         verificationToken: 'token',
         verificationTokenExpires: new Date(),
         resetToken: null,

@@ -1,6 +1,7 @@
 "use client";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import React, { useState } from "react";
 import { LearnFlowLogo } from "@/components/shared/LearnFlowLogo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,6 +18,11 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
   const getDashboardPath = (role?: string) => {
     switch (role) {
@@ -55,8 +61,20 @@ export const Navbar = () => {
           ))}
         </div>
 
-        {/* Auth / Profile */}
+        {/* Auth / Profile / Theme */}
         <div className="hidden md:flex items-center gap-3">
+          <button
+            onClick={toggleTheme}
+            className="p-2 mr-2 rounded-xl hover:bg-muted text-muted-foreground transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "light" ? (
+              <Moon className="w-5 h-5" />
+            ) : (
+              <Sun className="w-5 h-5" />
+            )}
+          </button>
+
           {!isAuthenticated ? (
             <>
               <Link
@@ -170,6 +188,17 @@ export const Navbar = () => {
           ))}
 
           <div className="pt-2 border-t border-border flex flex-col gap-2">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-between px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>
+              {theme === "light" ? (
+                <Moon className="w-4 h-4" />
+              ) : (
+                <Sun className="w-4 h-4" />
+              )}
+            </button>
             {!isAuthenticated ? (
               <>
                 <Link
