@@ -2,7 +2,7 @@
 
 import { DropResult } from "@hello-pangea/dnd";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Layout, ListTree, Video, Settings2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -54,6 +54,7 @@ const STEPS = [
 
 export default function AddCourseClient() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [activeStep, setActiveStep] = useState(0);
   const { data: categories, isLoading: loadingCategories } = useCategories();
 
@@ -62,6 +63,7 @@ export default function AddCourseClient() {
       courseService.createCourse(payload),
     onSuccess: () => {
       toast.success("Course published successfully!");
+      queryClient.invalidateQueries({ queryKey: ["instructor-courses"] });
       router.push("/dashboard/instructor");
     },
     onError: (error: Error) => {
@@ -130,6 +132,7 @@ export default function AddCourseClient() {
       originalPrice: data.originalPrice,
       duration: data.duration,
       level: data.level,
+      isFree: data.isFree,
       categoryId: data.categoryId,
       tags:
         data.tags

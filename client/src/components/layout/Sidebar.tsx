@@ -16,10 +16,11 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 import { LearnFlowLogo } from "@/components/shared/LearnFlowLogo";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 interface NavItem {
   label: string;
@@ -229,7 +230,7 @@ function SidebarNav({
   onNavClick?: () => void;
 }) {
   const location = usePathname();
-  const navigate = useRouter();
+  const { logout } = useAuth();
   const groups = navGroups[role] || navGroups["student"];
 
   return (
@@ -291,7 +292,7 @@ function SidebarNav({
       <div className="border-t border-sidebar-border p-3 space-y-1 shrink-0">
         <button
           onClick={() => {
-            navigate.push("/login");
+            logout();
             onNavClick?.();
           }}
           className="w-full flex cursor-pointer items-center gap-3 px-3 py-2 rounded-lg text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"

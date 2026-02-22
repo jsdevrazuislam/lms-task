@@ -116,6 +116,7 @@ export const useOverrideCourseStatus = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["super-admin", "courses"] });
       queryClient.invalidateQueries({ queryKey: ["super-admin", "stats"] });
+      queryClient.invalidateQueries({ queryKey: ["super-admin", "analytics"] });
       toast({
         title: "Success",
         description: "Course status updated successfully",

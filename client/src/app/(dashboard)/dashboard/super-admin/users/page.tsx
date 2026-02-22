@@ -140,7 +140,7 @@ export default function UserDirectoryPage() {
               )}
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="rounded-lg gap-2 cursor-pointer font-medium text-destructive focus:text-destructive"
+              className="rounded-lg gap-2 cursor-pointer font-medium"
               onClick={() => {
                 if (
                   confirm("Are you sure you want to delete this user forever?")

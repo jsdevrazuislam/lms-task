@@ -2,7 +2,7 @@
 
 import {
   DollarSign,
-  TrendingUp,
+  TrendingUp as TrendingUpIcon,
   ShoppingCart,
   AlertCircle,
   ChevronDown,
@@ -175,7 +175,7 @@ const RevenueClient = () => {
           loading={isStatsLoading}
         />
         <StatCard
-          icon={<TrendingUp className="w-5 h-5" />}
+          icon={<TrendingUpIcon className="w-5 h-5" />}
           title="Net Earnings"
           value={formatCurrency(totals.net)}
           description="After 20% platform fee"

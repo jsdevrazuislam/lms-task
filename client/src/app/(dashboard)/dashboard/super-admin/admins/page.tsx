@@ -122,7 +122,7 @@ export default function AdminManagementPage() {
               )}
             </DropdownMenuItem>
             <DropdownMenuItem
-              className="gap-3 py-3 rounded-xl cursor-pointer text-destructive focus:text-destructive"
+              className="gap-3 py-3 rounded-xl cursor-pointer"
               onClick={() => {
                 if (
                   confirm("Are you sure you want to delete this admin forever?")

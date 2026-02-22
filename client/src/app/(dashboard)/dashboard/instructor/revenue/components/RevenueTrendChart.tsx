@@ -1,4 +1,5 @@
 "use client";
+import { TrendingUp as TrendingUpIcon } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -47,6 +48,21 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 const RevenueTrendChart = ({ data }: RevenueTrendChartProps) => {
+  if (!data || data.length === 0) {
+    return (
+      <div className="h-full w-full flex flex-col items-center justify-center space-y-2 py-10 opacity-60">
+        <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center">
+          <TrendingUpIcon className="w-6 h-6 text-muted-foreground" />
+        </div>
+        <p className="text-sm font-semibold text-foreground">
+          No revenue trend data
+        </p>
+        <p className="text-[10px] text-muted-foreground">
+          Earnings will appear here monthly
+        </p>
+      </div>
+    );
+  }
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart

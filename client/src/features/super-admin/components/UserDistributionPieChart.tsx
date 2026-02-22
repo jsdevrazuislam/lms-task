@@ -28,7 +28,7 @@ export function UserDistributionPieChart({
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-[300px] w-full flex flex-col items-center justify-center border border-dashed border-border rounded-full bg-muted/5 translate-y-[-10px]">
+      <div className="h-[300px] w-full flex flex-col items-center justify-center border border-dashed border-border rounded-md bg-muted/5 translate-y-[-10px]">
         <p className="text-sm font-semibold text-foreground">No data</p>
         <p className="text-[10px] text-muted-foreground mt-1">
           Check back later

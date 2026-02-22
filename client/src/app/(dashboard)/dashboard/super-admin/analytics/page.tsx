@@ -108,7 +108,7 @@ export default function SuperAdminAnalyticsPage() {
       {/* Main Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card className=" border-none bg-card/60 backdrop-blur-sm rounded-3xl overflow-hidden">
-          <CardHeader className="p-8 pb-4">
+          <CardHeader className="px-4 pb-4">
             <CardTitle className="text-2xl font-bold flex items-center gap-3">
               <TrendingUp className="w-6 h-6 text-primary" />
               User Sign-up Trend
@@ -130,7 +130,7 @@ export default function SuperAdminAnalyticsPage() {
         </Card>
 
         <Card className=" border-none bg-card/60 backdrop-blur-sm rounded-3xl overflow-hidden">
-          <CardHeader className="p-8 pb-4">
+          <CardHeader className="px-4 pb-4">
             <CardTitle className="text-2xl font-bold flex items-center gap-3">
               <PieChartIcon className="w-6 h-6 text-primary" />
               Revenue by Category
@@ -154,7 +154,7 @@ export default function SuperAdminAnalyticsPage() {
 
       {/* Top Performing Courses */}
       <Card className=" border-none bg-card/60 backdrop-blur-sm rounded-3xl overflow-hidden">
-        <CardHeader className="p-8">
+        <CardHeader className="px-8">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-2xl font-bold flex items-center gap-3">

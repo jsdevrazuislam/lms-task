@@ -114,6 +114,7 @@ export interface CreateCoursePayload {
   originalPrice?: number;
   duration: string;
   level: ICourse["level"];
+  isFree: boolean;
   categoryId: string;
   tags?: string[];
   whatYouLearn?: string[];
