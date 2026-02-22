@@ -20,6 +20,7 @@ COPY . .
 
 RUN pnpm prisma generate || npx prisma generate
 RUN pnpm run build
+RUN npx prisma migrate deploy
 
 # Stage 2: Production
 FROM node:20-alpine AS runner
