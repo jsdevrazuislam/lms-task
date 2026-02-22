@@ -17,9 +17,6 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy server source code and prisma
-COPY server/ ./server/
-
 # Generate Prisma client
 RUN pnpm --filter server exec prisma generate
 
