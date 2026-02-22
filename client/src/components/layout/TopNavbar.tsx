@@ -1,3 +1,4 @@
+import { formatDistanceToNow } from "date-fns";
 import { Bell, Sun, Moon, ChevronDown, BookOpen, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
 import React from "react";
@@ -16,11 +17,20 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useNotifications } from "@/features/notifications/hooks/useNotifications";
 import { cn } from "@/lib/utils";
+import { NavUserSkeleton } from "../shared/SkeletonLoader";
 
 export function TopNavbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const { theme, setTheme } = useTheme();
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    isLoading: isNotifLoading,
+  } = useNotifications();
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
@@ -36,7 +46,7 @@ export function TopNavbar() {
               | "student"
               | "instructor"
               | "admin"
-              | "super-admin") || "student"
+              | "super_admin") || "student"
           }
         />
         <div className="w-8 h-8 rounded-lg bg-primary-muted flex items-center justify-center">
@@ -63,7 +73,9 @@ export function TopNavbar() {
           <PopoverTrigger asChild>
             <button className="relative p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground transition-all hover:bg-muted group">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full border-2 border-background" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full border-2 border-background animate-pulse" />
+              )}
             </button>
           </PopoverTrigger>
           <PopoverContent
@@ -71,57 +83,55 @@ export function TopNavbar() {
             align="end"
           >
             <div className="p-4 border-b border-border bg-muted/30 flex items-center justify-between">
-              <h4 className="font-semibold text-sm">Notifications</h4>
-              <button className="text-xs text-primary hover:underline font-medium">
-                Mark all as read
-              </button>
+              <h4 className="font-semibold text-sm">
+                Notifications {unreadCount > 0 && `(${unreadCount})`}
+              </h4>
+              {unreadCount > 0 && (
+                <button
+                  onClick={() => markAllAsRead()}
+                  className="text-xs text-primary hover:underline font-medium"
+                >
+                  Mark all as read
+                </button>
+              )}
             </div>
             <ScrollArea className="h-[300px]">
               <div className="divide-y divide-border">
-                {[
-                  {
-                    id: 1,
-                    title: "New Course Available",
-                    desc: "Build a Modern LMS with Next.js is now live!",
-                    time: "2m ago",
-                    unread: true,
-                  },
-                  {
-                    id: 2,
-                    title: "Assignment Graded",
-                    desc: "Your submission for Module 2 has been graded.",
-                    time: "1h ago",
-                    unread: true,
-                  },
-                  {
-                    id: 3,
-                    title: "Welcome to LearnFlow",
-                    desc: "Start your learning journey today with our top courses.",
-                    time: "2h ago",
-                    unread: false,
-                  },
-                ].map((n) => (
-                  <div
-                    key={n.id}
-                    className={cn(
-                      "p-4 hover:bg-muted/50 transition-colors cursor-pointer relative",
-                      n.unread && "bg-primary/5",
-                    )}
-                  >
-                    {n.unread && (
-                      <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-primary rounded-full" />
-                    )}
-                    <div className="flex justify-between items-start mb-1">
-                      <p className="text-sm font-semibold">{n.title}</p>
-                      <span className="text-[10px] text-muted-foreground">
-                        {n.time}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {n.desc}
-                    </p>
+                {isNotifLoading ? (
+                  <div className="p-8 text-center text-xs text-muted-foreground">
+                    Loading notifications...
                   </div>
-                ))}
+                ) : notifications.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-muted-foreground">
+                    No notifications yet.
+                  </div>
+                ) : (
+                  notifications.map((n) => (
+                    <div
+                      key={n.id}
+                      onClick={() => !n.isRead && markAsRead(n.id)}
+                      className={cn(
+                        "p-4 hover:bg-muted/50 transition-colors cursor-pointer relative",
+                        !n.isRead && "bg-primary/5",
+                      )}
+                    >
+                      {!n.isRead && (
+                        <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-primary rounded-full" />
+                      )}
+                      <div className="flex justify-between items-start mb-1">
+                        <p className="text-sm font-semibold">{n.title}</p>
+                        <span className="text-[10px] text-muted-foreground">
+                          {formatDistanceToNow(new Date(n.createdAt), {
+                            addSuffix: true,
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {n.message}
+                      </p>
+                    </div>
+                  ))
+                )}
               </div>
             </ScrollArea>
             <div className="p-2 border-t border-border bg-muted/30">
@@ -134,48 +144,52 @@ export function TopNavbar() {
 
         <div className="h-8 w-px bg-border mx-1" />
 
-        {/* User Profile Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 p-1 rounded-xl hover:bg-muted transition-all group outline-none">
-              <Avatar className="h-9 w-9 border-2 border-background shadow-sm ring-1 ring-border">
-                <AvatarImage src={user?.avatarUrl} alt={user?.firstName} />
-                <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs uppercase">
-                  {user ? `${user.firstName[0]}${user.lastName[0]}` : "CN"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="hidden lg:block text-left mr-1">
-                <p className="text-xs font-bold text-foreground leading-tight">
+        {/* User Profile Dropdown or Skeleton */}
+        {isLoading ? (
+          <NavUserSkeleton />
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 p-1 rounded-xl hover:bg-muted transition-all group outline-none">
+                <Avatar className="h-9 w-9 border-2 border-background shadow-sm ring-1 ring-border">
+                  <AvatarImage src={user?.avatarUrl} alt={user?.firstName} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs uppercase">
+                    {user ? `${user.firstName[0]}${user.lastName[0]}` : "CN"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden lg:block text-left mr-1">
+                  <p className="text-xs font-bold text-foreground leading-tight">
+                    {user?.firstName} {user?.lastName}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground leading-tight uppercase font-semibold mt-0.5">
+                    {user?.role.replace("_", " ")}
+                  </p>
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-64 p-2 rounded-2xl shadow-elevated border-border z-50"
+            >
+              <div className="px-3 py-4 flex flex-col gap-1 border-b border-border mb-2">
+                <p className="text-sm font-bold text-foreground">
                   {user?.firstName} {user?.lastName}
                 </p>
-                <p className="text-[10px] text-muted-foreground leading-tight uppercase font-semibold mt-0.5">
-                  {user?.role.replace("_", " ")}
+                <p className="text-xs text-muted-foreground truncate">
+                  {user?.email}
                 </p>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="w-64 p-2 rounded-2xl shadow-elevated border-border z-50"
-          >
-            <div className="px-3 py-4 flex flex-col gap-1 border-b border-border mb-2">
-              <p className="text-sm font-bold text-foreground">
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">
-                {user?.email}
-              </p>
-            </div>
-            <DropdownMenuItem
-              onClick={() => logout()}
-              className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="text-sm font-bold">Sign Out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              <DropdownMenuItem
+                onClick={() => logout()}
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="text-sm font-bold">Sign Out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </header>
   );

@@ -16,4 +16,6 @@ export default {
   cloudinary_cloud_name: process.env.CLOUD_NAME,
   cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
   cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
+  smtp_token: process.env.SMTP_TOKEN,
+  client_url: process.env.CLIENT_URL || 'http://localhost:3000',
 };

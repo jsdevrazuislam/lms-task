@@ -2,7 +2,7 @@ import type { User } from '@prisma/client';
 
 import prisma from '../../config/prisma.js';
 
-import type { IRegisterUser } from './auth.interface.js';
+import type { ICreateUser } from './auth.interface.js';
 
 /**
  * Repository layer for Authentication module.
@@ -27,7 +27,7 @@ export class AuthRepository {
    * @param data - The user registration data
    * @returns The newly created user object
    */
-  async createUser(data: IRegisterUser): Promise<User> {
+  async createUser(data: ICreateUser): Promise<User> {
     return prisma.user.create({
       data,
     });
@@ -65,6 +65,44 @@ export class AuthRepository {
   async deleteRefreshToken(token: string) {
     return prisma.refreshToken.delete({
       where: { token },
+    });
+  }
+
+  /**
+   * Update user details (dynamic)
+   * @param userId - The user ID
+   * @param data - The data to update
+   */
+  async updateUser(userId: string, data: Partial<User>) {
+    return prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+  }
+
+  /**
+   * Find a user by verification token
+   * @param token - The verification token
+   */
+  async findByVerificationToken(token: string): Promise<User | null> {
+    return prisma.user.findFirst({
+      where: {
+        verificationToken: token,
+        verificationTokenExpires: { gte: new Date() },
+      },
+    });
+  }
+
+  /**
+   * Find a user by reset token
+   * @param token - The reset token
+   */
+  async findByResetToken(token: string): Promise<User | null> {
+    return prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpires: { gte: new Date() },
+      },
     });
   }
 }

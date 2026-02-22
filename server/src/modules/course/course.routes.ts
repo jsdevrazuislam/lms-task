@@ -314,6 +314,27 @@ router.get(
   courseController.getVideoTicket
 );
 
+/**
+ * @swagger
+ * /courses/{id}/lessons/{lessonId}/video-key:
+ *   get:
+ *     summary: Get video decryption key for a lesson
+ *     tags: [Courses]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: 'string' }
+ *       - in: path
+ *         name: lessonId
+ *         required: true
+ *         schema: { type: 'string' }
+ *     responses:
+ *       200:
+ *         description: Video decryption key fetched successfully
+ */
 router.get(
   '/:id/lessons/:lessonId/video-key',
   auth(),

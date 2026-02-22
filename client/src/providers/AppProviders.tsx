@@ -7,6 +7,7 @@ import { Provider } from "react-redux";
 
 import { AuthInitializer } from "@/components/auth/AuthInitializer";
 import { store } from "@/store";
+import { SocketInitializer } from "./SocketInitializer";
 import { ThemeProvider } from "./ThemeProvider";
 
 export default function AppProviders({
@@ -36,7 +37,9 @@ export default function AppProviders({
     >
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
-          <AuthInitializer>{children}</AuthInitializer>
+          <AuthInitializer>
+            <SocketInitializer>{children}</SocketInitializer>
+          </AuthInitializer>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </Provider>

@@ -7,6 +7,7 @@ import type {
 import httpStatus from 'http-status';
 import type { ZodIssue } from 'zod';
 
+import ApiError from '../utils/ApiError.js';
 import logger from '../utils/logger.js';
 
 const globalErrorHandler: ErrorRequestHandler = (
@@ -25,7 +26,16 @@ const globalErrorHandler: ErrorRequestHandler = (
     },
   ];
 
-  if (err?.name === 'ZodError') {
+  if (err instanceof ApiError) {
+    statusCode = err.statusCode;
+    message = err.message;
+    errorSources = [
+      {
+        path: '',
+        message: err.message,
+      },
+    ];
+  } else if (err?.name === 'ZodError') {
     statusCode = httpStatus.BAD_REQUEST;
     message = 'Validation Error';
     errorSources = err.issues.map((issue: ZodIssue) => ({
@@ -42,6 +52,10 @@ const globalErrorHandler: ErrorRequestHandler = (
       },
     ];
   } else if (err instanceof Error) {
+    // If it's a generic error but has a statusCode property (like from some libraries)
+    if ('statusCode' in err) {
+      statusCode = err.statusCode as number;
+    }
     message = err.message;
     errorSources = [
       {

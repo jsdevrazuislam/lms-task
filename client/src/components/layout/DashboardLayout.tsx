@@ -11,22 +11,22 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, role }: DashboardLayoutProps) {
   const roleSlug = role.toLowerCase() as
-    | "super-admin"
+    | "super_admin"
     | "admin"
     | "instructor"
     | "student";
 
   return (
-    <RoleGate allowedRoles={[role]}>
-      <div className="flex h-screen bg-background overflow-hidden">
-        <Sidebar role={roleSlug} />
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <TopNavbar />
-          <main className="flex-1 overflow-y-auto scrollbar-thin p-4 sm:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto">{children}</div>
-          </main>
-        </div>
+    <div className="flex h-screen bg-background overflow-hidden font-sans">
+      <Sidebar role={roleSlug} />
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <TopNavbar />
+        <main className="flex-1 overflow-y-auto scrollbar-thin p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto">
+            <RoleGate allowedRoles={[role]}>{children}</RoleGate>
+          </div>
+        </main>
       </div>
-    </RoleGate>
+    </div>
   );
 }

@@ -2,7 +2,11 @@ import { EnrollmentStatus, Prisma } from '@prisma/client';
 import httpStatus from 'http-status';
 
 import ApiError from '../../common/utils/ApiError.js';
+import prisma from '../../config/prisma.js';
 import { courseRepository } from '../course/course.repository.js';
+import { EmailService } from '../email/email.service.js';
+import { NotificationType } from '../notification/notification.interface.js';
+import { NotificationService } from '../notification/notification.service.js';
 
 import { enrollmentRepository } from './enrollment.repository.js';
 
@@ -49,7 +53,50 @@ const enrollInCourse = async (studentId: string, courseId: string) => {
     );
   }
 
-  return await enrollmentRepository.create(studentId, courseId);
+  const result = await enrollmentRepository.create(studentId, courseId);
+
+  // Fetch full details for notification and email
+  const student = await prisma.user.findUnique({ where: { id: studentId } });
+  const enrolledCourse = await courseRepository.findById(courseId);
+
+  if (student && enrolledCourse) {
+    // Trigger in-app notification
+    await NotificationService.createNotification({
+      userId: studentId,
+      title: 'Course Enrollment',
+      message: `You have successfully enrolled in ${enrolledCourse.title}`,
+      type: NotificationType.ENROLLMENT,
+    });
+
+    // Send confirmation email
+    await EmailService.sendEmail(
+      'Enrollment Confirmation',
+      student.email,
+      `${student.firstName} ${student.lastName}`,
+      {
+        course_name: enrolledCourse.title,
+        course_url: `${process.env.CLIENT_URL}/dashboard/student/courses/${enrolledCourse.id}`,
+        instructor_name: enrolledCourse.instructor
+          ? `${enrolledCourse.instructor.firstName} ${enrolledCourse.instructor.lastName}`
+          : 'Instructor',
+        enrollment_date: new Date().toLocaleDateString(),
+        name: student.firstName,
+      },
+      19
+    );
+
+    // Notify Instructor (Real-time alert)
+    if (enrolledCourse.instructor) {
+      await NotificationService.createNotification({
+        userId: enrolledCourse.instructor.id,
+        title: 'New Enrollment',
+        message: `${student.firstName} ${student.lastName} has enrolled in your course: ${enrolledCourse.title}`,
+        type: NotificationType.INFO,
+      });
+    }
+  }
+
+  return result;
 };
 
 /**
@@ -146,6 +193,9 @@ const getStudentStats = async (studentId: string) => {
   const activeCourses = enrollments.filter(
     (e) => e.status === EnrollmentStatus.ACTIVE
   ).length;
+  const droppedCourses = enrollments.filter(
+    (e) => e.status === EnrollmentStatus.DROPPED
+  ).length;
 
   // Calculate overall completion percentage
   let totalLessonsAcrossAll = 0;
@@ -221,6 +271,7 @@ const getStudentStats = async (studentId: string) => {
     completedCourses,
     activeCourses,
     overallProgress,
+    droppedCourses,
     enrollmentDetails: filteredEnrollmentDetails,
   };
 };
@@ -252,10 +303,37 @@ const getCertificates = async (studentId: string) => {
   );
 };
 
+const dropCourse = async (studentId: string, courseId: string) => {
+  const [enrollment] = await enrollmentRepository.findMany({
+    studentId,
+    courseId,
+  });
+
+  if (!enrollment) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Enrollment not found');
+  }
+
+  const result = await prisma.enrollment.update({
+    where: { id: enrollment.id },
+    data: { status: EnrollmentStatus.DROPPED },
+  });
+
+  // Trigger notification
+  await NotificationService.createNotification({
+    userId: studentId,
+    title: 'Course Dropped',
+    message: `You have dropped the course`,
+    type: NotificationType.WARNING,
+  });
+
+  return result;
+};
+
 export const EnrollmentService = {
   enrollInCourse,
-  getEnrollmentStatus,
   getStudentEnrollments,
+  getEnrollmentStatus,
   getStudentStats,
   getCertificates,
+  dropCourse,
 };

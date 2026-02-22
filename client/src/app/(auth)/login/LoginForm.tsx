@@ -2,6 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, ArrowRight, Mail, Lock } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FormInput } from "@/components/shared/FormInput";
@@ -11,6 +12,9 @@ import { loginSchema, LoginFormData } from "@/lib/validations/auth";
 export function LoginForm() {
   const [showPass, setShowPass] = useState(false);
   const { login, isLoggingIn, error } = useAuth();
+
+  const searchParams = useSearchParams();
+  const verifyState = searchParams.get("verify");
 
   const {
     register,
@@ -44,6 +48,22 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      {verifyState === "check" && (
+        <div className="p-4 rounded-xl bg-primary/10 border border-primary/20 flex gap-3 animate-fade-in mb-2">
+          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+            <Mail className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-foreground">
+              Verify your email
+            </h4>
+            <p className="text-xs text-muted-foreground mt-1">
+              We&apos;ve sent a verification link to your email. Please check
+              your inbox (and spam) to activate your account.
+            </p>
+          </div>
+        </div>
+      )}
       {error && (
         <div className="p-3 rounded-lg bg-destructive-muted text-destructive text-sm font-medium border border-destructive/20 animate-fade-in">
           {error}

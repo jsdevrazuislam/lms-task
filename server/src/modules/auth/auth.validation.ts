@@ -35,8 +35,41 @@ export const refreshTokenValidationSchema = z.object({
   }),
 });
 
+/**
+ * Zod schema for email verification validation
+ */
+export const verifyEmailValidationSchema = z.object({
+  query: z.object({
+    token: z.string().min(1, { message: 'Verification token is required' }),
+  }),
+});
+
+/**
+ * Zod schema for forgot password validation
+ */
+export const forgotPasswordValidationSchema = z.object({
+  body: z.object({
+    email: z.string().email({ message: 'Invalid email address' }),
+  }),
+});
+
+/**
+ * Zod schema for reset password validation
+ */
+export const resetPasswordValidationSchema = z.object({
+  body: z.object({
+    token: z.string().min(1, { message: 'Reset token is required' }),
+    password: z
+      .string()
+      .min(6, { message: 'Password must be at least 6 characters long' }),
+  }),
+});
+
 export const AuthValidation = {
   registerValidationSchema,
   loginValidationSchema,
   refreshTokenValidationSchema,
+  verifyEmailValidationSchema,
+  forgotPasswordValidationSchema,
+  resetPasswordValidationSchema,
 };

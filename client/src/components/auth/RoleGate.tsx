@@ -4,6 +4,8 @@ import { ReactNode, useEffect } from "react";
 import { UserRole } from "@/features/auth/types";
 import { useAppSelector } from "@/store";
 
+import { DashboardContentSkeleton } from "../shared/SkeletonLoader";
+
 interface RoleGateProps {
   children: ReactNode;
   allowedRoles: UserRole[];
@@ -23,20 +25,13 @@ export function RoleGate({ children, allowedRoles }: RoleGateProps) {
       }
 
       if (!allowedRoles.includes(user.role)) {
-        router.push("/dashboard"); // Redirect to their own dashboard or an unauthorized page
+        router.push("/dashboard");
       }
     }
   }, [user, isLoading, isAuthenticated, allowedRoles, router]);
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] animate-pulse">
-        <div className="w-10 h-10 rounded-xl bg-primary-muted animate-spin border-2 border-primary border-t-transparent mb-4" />
-        <p className="text-xs text-muted-foreground font-medium">
-          Verifying access...
-        </p>
-      </div>
-    );
+    return <DashboardContentSkeleton />;
   }
 
   if (!user || !allowedRoles.includes(user.role)) {

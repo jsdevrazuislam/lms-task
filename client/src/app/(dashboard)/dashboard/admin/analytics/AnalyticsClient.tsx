@@ -119,7 +119,7 @@ const AdminAnalytics = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Enrollment Breakdown Bar Chart */}
-          <Card className="border-border shadow-md-theme overflow-hidden">
+          <Card className="border-border  overflow-hidden">
             <CardHeader className="pb-4 bg-muted/20 border-b border-border/50">
               <CardTitle className="text-lg font-bold">
                 Top Courses Enrollment
@@ -184,7 +184,7 @@ const AdminAnalytics = () => {
           </Card>
 
           {/* Popular Courses Pie Chart */}
-          <Card className="border-border shadow-md-theme overflow-hidden">
+          <Card className="border-border  overflow-hidden">
             <CardHeader className="pb-4 bg-muted/20 border-b border-border/50">
               <CardTitle className="text-lg font-bold">
                 Market Share Breakdown

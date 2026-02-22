@@ -19,7 +19,7 @@ export const Testimonials = () => {
             ({ name, role, company, text, avatar: _avatar, rating }) => (
               <div
                 key={name}
-                className="p-6 rounded-2xl border border-border bg-card hover:shadow-md-theme transition-all duration-300"
+                className="p-6 rounded-2xl border border-border bg-card hover: transition-all duration-300"
               >
                 {/* Stars */}
                 <div className="flex gap-0.5 mb-4">

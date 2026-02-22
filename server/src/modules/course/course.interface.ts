@@ -58,6 +58,7 @@ export interface ICourseFilterRequest {
   sortOrder?: 'asc' | 'desc';
   level?: string;
   rating?: string;
+  cursor?: string;
 }
 
 export type TCourseWithRelations = Course & {

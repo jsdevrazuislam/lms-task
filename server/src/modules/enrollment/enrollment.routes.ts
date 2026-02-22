@@ -121,4 +121,27 @@ router.get(
   EnrollmentController.getEnrollmentStatus
 );
 
+/**
+ * @swagger
+ * /enrollments/{courseId}/drop:
+ *   patch:
+ *     summary: Drop a course (Student only)
+ *     tags: [Enrollments]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: courseId
+ *         required: true
+ *         schema: { type: 'string' }
+ *     responses:
+ *       200:
+ *         description: Course dropped successfully
+ */
+router.patch(
+  '/:courseId/drop',
+  auth(UserRole.STUDENT),
+  EnrollmentController.dropCourse
+);
+
 export const EnrollmentRoutes: Router = router;

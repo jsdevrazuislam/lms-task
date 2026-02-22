@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { authService } from "@/features/auth/services/auth.service";
 import {
@@ -12,11 +11,10 @@ import {
   setInitialized,
 } from "@/features/auth/store/authSlice";
 import { tokenUtils } from "@/features/auth/utils/token.utils";
-import { useAppDispatch, useAppSelector } from "@/store";
+import { useAppDispatch } from "@/store";
 
 export function AuthInitializer({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
-  const { isInitialized } = useAppSelector((state) => state.auth);
   const token = tokenUtils.getToken();
 
   const {
@@ -39,11 +37,11 @@ export function AuthInitializer({ children }: { children: React.ReactNode }) {
     }
 
     // Handle successful hydration
-    if (user) {
+    if (user?.data) {
       dispatch(
         setCredentials({
           user: user.data,
-          token: tokenUtils.getToken() || token,
+          accessToken: tokenUtils.getToken() || (token as string),
           remember: tokenUtils.shouldRemember(),
         }),
       );
@@ -64,20 +62,7 @@ export function AuthInitializer({ children }: { children: React.ReactNode }) {
     }
   }, [user, error, isFetched, token, dispatch]);
 
-  const isRehydrating = !!token && !isInitialized;
-
-  // PREVENT RENDER: If we have a token but haven't initialized/rehydrated yet,
-  // we must block children to prevent premature API calls from protected components.
-  if (isRehydrating) {
-    return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center bg-background z-50">
-        <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
-        <p className="text-sm font-medium text-muted-foreground animate-pulse">
-          Securing your session...
-        </p>
-      </div>
-    );
-  }
-
+  // No longer blocking children here. Components will handle their own
+  // loading states via Redux isLoading/isAuthenticated or useAuth hook.
   return <>{children}</>;
 }

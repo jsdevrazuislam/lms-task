@@ -66,6 +66,7 @@ export interface ICourse {
   tagColor?: string;
   curriculum?: ICurriculumSection[];
   modules?: IModule[];
+  metaDescription?: string;
   instructor?: {
     id: string;
     firstName: string;
@@ -94,6 +95,8 @@ export interface CoursesResponse {
     limit: number;
     total: number;
     totalPage: number;
+    nextCursor?: string | null;
+    hasNextPage?: boolean;
   };
 }
 

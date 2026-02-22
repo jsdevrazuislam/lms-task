@@ -45,6 +45,11 @@ const auth = (...requiredRoles: TUserRole[]) => {
 
     // Add decoded user to request
     req.user = decoded as ITokenPayload;
+
+    // Set user context for logging
+    const { setContextValue } = await import('./context.middleware.js');
+    setContextValue('userId', decoded.id);
+
     next();
   });
 };

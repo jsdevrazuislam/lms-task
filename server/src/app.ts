@@ -7,12 +7,16 @@ import helmet from 'helmet';
 import httpStatus from 'http-status';
 import swaggerUi from 'swagger-ui-express';
 
+import contextMiddleware from './common/middlewares/context.middleware.js';
 import globalErrorHandler from './common/middlewares/globalErrorHandler.js';
 import requestLogger from './common/middlewares/requestLogger.js';
 import swaggerSpec from './config/swagger.js';
 import router from './routes/index.js';
 
 const app: Application = express();
+
+// Context Middleware (MUST BE FIRST)
+app.use(contextMiddleware);
 
 // Request Logger
 app.use(requestLogger);
@@ -39,6 +43,15 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Application Routes
 app.use('/api/v1', router);
+
+// Health Check
+app.get('/health', (req: Request, res: Response) => {
+  res.status(httpStatus.OK).json({
+    status: 'UP',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
 
 // Root Route
 app.get('/', (req: Request, res: Response) => {

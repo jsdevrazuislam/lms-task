@@ -17,22 +17,12 @@ export class AuthController {
    */
   register = catchAsync(async (req: Request, res: Response) => {
     const result = await authService.register(req.body);
-    const { refreshToken, accessToken, user } = result;
-
-    // Set refresh token in cookie
-    res.cookie('refreshToken', refreshToken, {
-      secure: config.NODE_ENV === 'production',
-      httpOnly: true,
-    });
 
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
       success: true,
-      message: 'User registered successfully',
-      data: {
-        accessToken,
-        user,
-      },
+      message: result.message,
+      data: null,
     });
   });
 
@@ -116,6 +106,64 @@ export class AuthController {
       success: true,
       message: 'User profile fetched successfully',
       data: result,
+    });
+  });
+
+  /**
+   * Verify email
+   */
+  verifyEmail = catchAsync(async (req: Request, res: Response) => {
+    const { token } = req.query;
+    const result = await authService.verifyEmail(token as string);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: result.message,
+      data: null,
+    });
+  });
+
+  /**
+   * Forgot password
+   */
+  forgotPassword = catchAsync(async (req: Request, res: Response) => {
+    const result = await authService.forgotPassword(req.body);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: result.message,
+      data: null,
+    });
+  });
+
+  /**
+   * Reset password
+   */
+  resetPassword = catchAsync(async (req: Request, res: Response) => {
+    const result = await authService.resetPassword(req.body);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: result.message,
+      data: null,
+    });
+  });
+
+  /**
+   * Resend verification email
+   */
+  resendVerification = catchAsync(async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const result = await authService.resendVerification(email);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: result.message,
+      data: null,
     });
   });
 }

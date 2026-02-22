@@ -120,6 +120,31 @@ const options: swaggerJsdoc.Options = {
             totalPage: { type: 'integer' },
           },
         },
+        Notification: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            userId: { type: 'string' },
+            title: { type: 'string' },
+            message: { type: 'string' },
+            type: {
+              type: 'string',
+              enum: ['INFO', 'SUCCESS', 'WARNING', 'ERROR', 'ENROLLMENT'],
+            },
+            isRead: { type: 'boolean' },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        TopCourse: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            title: { type: 'string' },
+            instructorName: { type: 'string' },
+            enrollmentCount: { type: 'integer' },
+            revenue: { type: 'number' },
+          },
+        },
       },
     },
     security: [

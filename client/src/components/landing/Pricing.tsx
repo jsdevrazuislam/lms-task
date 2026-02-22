@@ -23,7 +23,7 @@ export const Pricing = () => {
               className={`relative p-8 rounded-2xl border transition-all duration-300 flex flex-col ${
                 plan.highlighted
                   ? "border-primary bg-linear-to-b from-primary/10 to-card shadow-primary"
-                  : "border-border bg-card hover:border-primary/30 hover:shadow-md-theme"
+                  : "border-border bg-card hover:border-primary/30 hover:"
               }`}
             >
               {plan.highlighted && (

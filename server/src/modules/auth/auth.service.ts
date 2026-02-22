@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import bcrypt from 'bcryptjs';
 import httpStatus from 'http-status';
 import jwt from 'jsonwebtoken';
@@ -6,11 +8,14 @@ import type { SignOptions } from 'jsonwebtoken';
 import ApiError from '../../common/utils/ApiError.js';
 import config from '../../config/index.js';
 import prisma from '../../config/prisma.js';
+import { EmailService } from '../email/email.service.js';
 
 import type {
   IAuthResponse,
+  IForgotPassword,
   ILoginUser,
   IRegisterUser,
+  IResetPassword,
   ITokenPayload,
 } from './auth.interface.js';
 import { authRepository } from './auth.repository.js';
@@ -25,7 +30,7 @@ export class AuthService {
    * @param data - The user registration data
    * @returns User object and tokens
    */
-  async register(data: IRegisterUser): Promise<IAuthResponse> {
+  async register(data: IRegisterUser): Promise<{ message: string }> {
     const isUserExist = await authRepository.findByEmail(data.email);
 
     if (isUserExist) {
@@ -41,41 +46,31 @@ export class AuthService {
       Number(config.bcrypt_salt_rounds)
     );
 
-    const newUser = await authRepository.createUser({
+    // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationTokenExpires = new Date(Date.now() + 3600000); // 1 hour
+
+    await authRepository.createUser({
       ...data,
       password: hashedPassword,
+      verificationToken,
+      verificationTokenExpires,
     });
 
-    // Generate tokens
-    const { accessToken, refreshToken } = this.generateTokens({
-      id: newUser.id,
-      email: newUser.email,
-      role: newUser.role,
-    });
+    // Send verification email
+    const verificationLink = `${config.client_url}/verify-email?token=${verificationToken}`;
 
-    // Store refresh token in DB
-    const expiresAt = new Date();
-    expiresAt.setDate(
-      expiresAt.getDate() + parseInt(config.jwt_refresh_expires_in as string) ||
-        30
-    );
-
-    await authRepository.upsertRefreshToken(
-      newUser.id,
-      refreshToken,
-      expiresAt
+    await EmailService.sendEmail(
+      'Verify Your Email',
+      data.email,
+      `${data.firstName} ${data.lastName}`,
+      { verification_link: verificationLink, name: data.firstName },
+      17
     );
 
     return {
-      accessToken,
-      refreshToken,
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        role: newUser.role,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-      },
+      message:
+        'Registration successful! Please check your email to verify your account.',
     };
   }
 
@@ -89,6 +84,14 @@ export class AuthService {
 
     if (!user) {
       throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    // Check if verified
+    if (!user.isVerified) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        'Please verify your email before logging in.'
+      );
     }
 
     // Verify password
@@ -128,6 +131,125 @@ export class AuthService {
         lastName: user.lastName,
       },
     };
+  }
+
+  /**
+   * Verify user email using token
+   * @param token - Verification token
+   */
+  async verifyEmail(token: string) {
+    const user = await authRepository.findByVerificationToken(token);
+
+    if (!user) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Invalid or expired verification token'
+      );
+    }
+
+    await authRepository.updateUser(user.id, {
+      isVerified: true,
+      verificationToken: null,
+      verificationTokenExpires: null,
+    });
+
+    return { message: 'Email verified successfully! You can now log in.' };
+  }
+
+  /**
+   * Resend verification email
+   * @param email - User email
+   */
+  async resendVerification(email: string) {
+    const user = await authRepository.findByEmail(email);
+
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    if (user.isVerified) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Email is already verified');
+    }
+
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationTokenExpires = new Date(Date.now() + 3600000); // 1 hour
+
+    await authRepository.updateUser(user.id, {
+      verificationToken,
+      verificationTokenExpires,
+    });
+
+    const verificationLink = `${config.client_url}/verify-email?token=${verificationToken}`;
+
+    await EmailService.sendEmail(
+      'Verify Your Email',
+      user.email,
+      `${user.firstName} ${user.lastName}`,
+      { verification_link: verificationLink, name: user.firstName },
+      17
+    );
+
+    return { message: 'Verification email resent successfully.' };
+  }
+
+  /**
+   * Initiate password reset flow
+   * @param data - User email
+   */
+  async forgotPassword(data: IForgotPassword) {
+    const user = await authRepository.findByEmail(data.email);
+
+    if (!user) {
+      throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpires = new Date(Date.now() + 900000); // 15 minutes
+
+    await authRepository.updateUser(user.id, {
+      resetToken,
+      resetTokenExpires,
+    });
+
+    const resetLink = `${config.client_url}/reset-password?token=${resetToken}`;
+
+    await EmailService.sendEmail(
+      'Reset Your Password',
+      user.email,
+      `${user.firstName} ${user.lastName}`,
+      { reset_link: resetLink, name: user.firstName },
+      18
+    );
+
+    return { message: 'Password reset link sent to your email.' };
+  }
+
+  /**
+   * Reset password using token
+   * @param data - Token and new password
+   */
+  async resetPassword(data: IResetPassword) {
+    const user = await authRepository.findByResetToken(data.token);
+
+    if (!user) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'Invalid or expired reset token'
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(
+      data.password,
+      Number(config.bcrypt_salt_rounds)
+    );
+
+    await authRepository.updateUser(user.id, {
+      password: hashedPassword,
+      resetToken: null,
+      resetTokenExpires: null,
+    });
+
+    return { message: 'Password reset successful! You can now log in.' };
   }
 
   /**
