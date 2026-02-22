@@ -8,6 +8,9 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat
 RUN npm install -g pnpm@10.28.0
 
+# NOTE: This Dockerfile MUST be built from the repository root (context: .)
+# Command: docker build -t lms-server -f server/Dockerfile .
+
 # Copy root workspace files
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 # Copy server package file
