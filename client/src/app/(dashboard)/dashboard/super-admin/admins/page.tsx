@@ -6,6 +6,7 @@ import {
   Ban,
   Users as UsersIcon,
   Trash2,
+  Edit,
 } from "lucide-react";
 import { useState } from "react";
 import { DataTable, Column } from "@/components/shared/DataTable";
@@ -19,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CreateAdminModal } from "@/features/super-admin/components/CreateAdminModal";
+import { UpdateAdminModal } from "@/features/super-admin/components/UpdateAdminModal";
 import {
   useSuperAdminAdmins,
   useToggleUserStatus,
@@ -28,6 +30,10 @@ import { ISuperAdminUser } from "@/features/super-admin/types";
 
 export default function AdminManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedAdmin, setSelectedAdmin] = useState<ISuperAdminUser | null>(
+    null,
+  );
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const pageSize = 10;
 
   const { data: response, isLoading } = useSuperAdminAdmins(
@@ -106,6 +112,15 @@ export default function AdminManagementPage() {
           >
             <DropdownMenuItem
               className="gap-3 py-3 rounded-xl cursor-pointer"
+              onClick={() => {
+                setSelectedAdmin(admin);
+                setIsUpdateModalOpen(true);
+              }}
+            >
+              <Edit className="w-4 h-4" /> Edit Details
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="gap-3 py-3 rounded-xl cursor-pointer"
               onClick={() =>
                 toggleStatus({ id: admin.id, isActive: !admin.isActive })
               }
@@ -178,6 +193,15 @@ export default function AdminManagementPage() {
           />
         </div>
       </Card>
+
+      <UpdateAdminModal
+        admin={selectedAdmin}
+        isOpen={isUpdateModalOpen}
+        onClose={() => {
+          setIsUpdateModalOpen(false);
+          setSelectedAdmin(null);
+        }}
+      />
     </div>
   );
 }

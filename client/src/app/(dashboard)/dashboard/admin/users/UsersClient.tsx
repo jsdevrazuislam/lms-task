@@ -11,6 +11,8 @@ import {
   Calendar,
   RefreshCcw,
   AlertCircle,
+  Ban,
+  CheckCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { DataTable } from "@/components/shared/DataTable";
@@ -80,6 +82,7 @@ const AdminUsers = () => {
     handleUpdateRole,
     handleDeleteUser,
     refetch,
+    handleToggleStatus,
   } = useUsers();
 
   const [search, setSearch] = useState("");
@@ -133,6 +136,26 @@ const AdminUsers = () => {
       },
     },
     {
+      header: "Status",
+      render: (u: User) => (
+        <Badge
+          variant="outline"
+          className={`gap-1 px-2 py-0.5 font-bold tracking-tight border-none ${
+            u.isActive
+              ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+              : "bg-red-50 text-red-600 border-red-100"
+          }`}
+        >
+          <div
+            className={`w-1.5 h-1.5 rounded-full ${
+              u.isActive ? "bg-emerald-500" : "bg-red-500"
+            }`}
+          />
+          {u.isActive ? "Active" : "Suspended"}
+        </Badge>
+      ),
+    },
+    {
       header: "Join Date",
       render: (u: User) => (
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
@@ -157,6 +180,25 @@ const AdminUsers = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
             <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-widest">
+              Account Actions
+            </div>
+            <DropdownMenuItem
+              onClick={() => handleToggleStatus(u.id, !u.isActive)}
+              className="gap-2 cursor-pointer font-medium"
+            >
+              {u.isActive ? (
+                <>
+                  <Ban className="w-4 h-4 text-red-500" /> Suspend Account
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-4 h-4 text-emerald-500" /> Activate
+                  Account
+                </>
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-widest">
               Change Role
             </div>
             {(["STUDENT", "INSTRUCTOR", "ADMIN"] as UserRole[]).map((role) => (
@@ -172,7 +214,7 @@ const AdminUsers = () => {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => setConfirmAction({ id: u.id, type: "delete" })}
-              className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+              className="gap-2 cursor-pointer"
             >
               <Trash2 className="w-4 h-4" /> Delete Account
             </DropdownMenuItem>

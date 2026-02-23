@@ -135,4 +135,37 @@ router.delete(
   userController.deleteUser
 );
 
+/**
+ * @swagger
+ * /users/{id}/status:
+ *   patch:
+ *     summary: Toggle user status (Admin only)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [isActive]
+ *             properties:
+ *               isActive: { type: boolean }
+ *     responses:
+ *       200:
+ *         description: User status updated successfully
+ */
+router.patch(
+  '/:id/status',
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  userController.toggleUserStatus
+);
+
 export const UserRoutes: Router = router;

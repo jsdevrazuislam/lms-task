@@ -55,6 +55,25 @@ export const useUsers = (
     },
   });
 
+  const toggleStatusMutation = useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      userService.toggleUserStatus(id, isActive),
+    onSuccess: (_, { isActive }) => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast({
+        title: "Success",
+        description: `User ${isActive ? "activated" : "deactivated"} successfully`,
+      });
+    },
+    onError: (err: Error) => {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to update user status",
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     users: data?.data || [],
     meta: data?.meta || { page: 1, limit: 10, total: 0 },
@@ -64,6 +83,8 @@ export const useUsers = (
     setFilters,
     handleUpdateRole: (id: string, role: UserRole) =>
       updateRoleMutation.mutateAsync({ id, role }),
+    handleToggleStatus: (id: string, isActive: boolean) =>
+      toggleStatusMutation.mutateAsync({ id, isActive }),
     handleDeleteUser: (id: string) => deleteUserMutation.mutateAsync(id),
     refetch: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
   };

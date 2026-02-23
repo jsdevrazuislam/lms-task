@@ -170,7 +170,7 @@ const AdminCourses = () => {
             {c.status !== CourseStatus.ARCHIVED && (
               <DropdownMenuItem
                 onClick={() => setArchiveTarget(c.id)}
-                className="gap-2 cursor-pointer text-destructive focus:text-destructive"
+                className="gap-2 cursor-pointer"
               >
                 <Archive className="w-4 h-4" /> Archive Course
               </DropdownMenuItem>
@@ -178,7 +178,7 @@ const AdminCourses = () => {
             {c.status === CourseStatus.DRAFT && (
               <DropdownMenuItem
                 onClick={() => handleUpdateStatus(c.id, CourseStatus.PUBLISHED)}
-                className="gap-2 cursor-pointer text-success focus:text-success"
+                className="gap-2 cursor-pointer"
               >
                 <RefreshCcw className="w-4 h-4" /> Publish Course
               </DropdownMenuItem>

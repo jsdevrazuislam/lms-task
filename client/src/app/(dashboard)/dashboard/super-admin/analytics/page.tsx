@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { EnrollmentGrowthChart } from "@/features/super-admin/components/EnrollmentGrowthChart";
 import { RevenueAreaChart } from "@/features/super-admin/components/RevenueAreaChart";
 import { UserDistributionPieChart } from "@/features/super-admin/components/UserDistributionPieChart";
 import {
@@ -96,6 +97,19 @@ export default function SuperAdminAnalyticsPage() {
           description="Published content"
         />
         <StatCard
+          title="Total Enrollments"
+          value={
+            analyticsData?.enrollmentGrowth?.reduce(
+              (sum, g) => sum + g.count,
+              0,
+            ) || 0
+          }
+          icon={<Users className="w-6 h-6" />}
+          color="bg-emerald-500/10 text-emerald-600"
+          trend={{ value: "15.4%", isPositive: true }}
+          description="Total student enrollments"
+        />
+        <StatCard
           title="Conversion Rate"
           value="3.8%"
           icon={<ArrowUpRight className="w-6 h-6" />}
@@ -104,6 +118,22 @@ export default function SuperAdminAnalyticsPage() {
           description="Lead to enrollment"
         />
       </div>
+
+      {/* Enrollment Statistics */}
+      <Card className=" border-none bg-card/60 backdrop-blur-sm rounded-3xl overflow-hidden">
+        <CardHeader className="px-4 pb-4">
+          <CardTitle className="text-2xl font-bold flex items-center gap-3">
+            <TrendingUp className="w-6 h-6 text-emerald-500" />
+            Recent Enrollment Growth
+          </CardTitle>
+          <CardDescription>
+            Daily enrollment metrics for the last 10 days
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-6 pt-0">
+          <EnrollmentGrowthChart data={analyticsData?.enrollmentGrowth || []} />
+        </CardContent>
+      </Card>
 
       {/* Main Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

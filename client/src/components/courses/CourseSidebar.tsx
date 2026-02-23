@@ -12,10 +12,12 @@ import {
   BarChart2,
 } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 import { ICourse } from "@/features/course/types";
 import { useEnrollment } from "@/features/enrollment/hooks/useEnrollment";
 import { useEnrollmentStatus } from "@/features/enrollment/hooks/useEnrollmentStatus";
+import { PreviewModal } from "./PreviewModal";
 
 interface CourseSidebarProps {
   course: ICourse;
@@ -23,6 +25,7 @@ interface CourseSidebarProps {
 }
 
 export const CourseSidebar = ({ course, totalLessons }: CourseSidebarProps) => {
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const { enroll, isEnrolling } = useEnrollment(course.id);
   const { data: enrollmentStatus, isLoading: isLoadingStatus } =
     useEnrollmentStatus(course.id);
@@ -41,9 +44,10 @@ export const CourseSidebar = ({ course, totalLessons }: CourseSidebarProps) => {
         <div className="rounded-2xl border border-border bg-card shadow-lg-theme overflow-hidden">
           {/* Video preview thumb */}
           <div
-            className={`h-48 bg-linear-to-br ${course.gradient || "from-primary/20 to-primary/40"} relative flex items-center justify-center`}
+            onClick={() => setIsPreviewOpen(true)}
+            className={`h-48 bg-linear-to-br ${course.gradient || "from-primary/20 to-primary/40"} relative flex items-center justify-center cursor-pointer group`}
           >
-            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors group">
+            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition-colors">
               <Play className="w-7 h-7 text-white group-hover:scale-110 transition-transform" />
             </div>
             <div className="absolute bottom-3 left-3 right-3 text-center">
@@ -179,6 +183,12 @@ export const CourseSidebar = ({ course, totalLessons }: CourseSidebarProps) => {
           </div>
         )}
       </div>
+      <PreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        title={course.title}
+        videoUrl={course.promoVideoUrl}
+      />
     </div>
   );
 };

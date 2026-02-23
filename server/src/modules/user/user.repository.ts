@@ -2,10 +2,14 @@ import type { Prisma } from '@prisma/client';
 import { UserRole } from '@prisma/client';
 
 import prisma from '../../config/prisma.js';
+import type { ITokenPayload } from '../auth/auth.interface.js';
 
 import type { IUserFilterRequest } from './user.interface.js';
 
-const findAll = async (filters: IUserFilterRequest) => {
+const findAll = async (
+  filters: IUserFilterRequest,
+  requester?: ITokenPayload
+) => {
   const {
     searchTerm,
     role,
@@ -19,6 +23,25 @@ const findAll = async (filters: IUserFilterRequest) => {
 
   const andConditions: Prisma.UserWhereInput[] = [];
 
+  // Role visibility restrictions
+  if (requester?.role === UserRole.ADMIN) {
+    if (role) {
+      if (role === UserRole.ADMIN || role === UserRole.SUPER_ADMIN) {
+        // Admins cannot see other admins or super admins
+        andConditions.push({ id: '00000000-0000-0000-0000-000000000000' });
+      } else {
+        andConditions.push({ role });
+      }
+    } else {
+      // Default view for Admin: only Students and Instructors
+      andConditions.push({
+        role: { in: [UserRole.STUDENT, UserRole.INSTRUCTOR] },
+      });
+    }
+  } else if (role) {
+    andConditions.push({ role });
+  }
+
   if (searchTerm) {
     andConditions.push({
       OR: [
@@ -27,10 +50,6 @@ const findAll = async (filters: IUserFilterRequest) => {
         { email: { contains: searchTerm, mode: 'insensitive' } },
       ],
     });
-  }
-
-  if (role) {
-    andConditions.push({ role });
   }
 
   if (email) {
@@ -51,6 +70,7 @@ const findAll = async (filters: IUserFilterRequest) => {
       firstName: true,
       lastName: true,
       role: true,
+      isActive: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -77,6 +97,7 @@ const findById = async (id: string) => {
       firstName: true,
       lastName: true,
       role: true,
+      isActive: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -93,6 +114,22 @@ const updateRole = async (id: string, role: UserRole) => {
       firstName: true,
       lastName: true,
       role: true,
+      isActive: true,
+    },
+  });
+};
+
+const updateStatus = async (id: string, isActive: boolean) => {
+  return prisma.user.update({
+    where: { id },
+    data: { isActive },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      role: true,
+      isActive: true,
     },
   });
 };
@@ -107,5 +144,6 @@ export const userRepository = {
   findAll,
   findById,
   updateRole,
+  updateStatus,
   remove,
 };

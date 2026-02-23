@@ -8,6 +8,7 @@ export interface User {
   firstName: string;
   lastName: string;
   role: UserRole;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -42,6 +43,13 @@ export const userService = {
   },
   deleteUser: async (id: string) => {
     const response = await apiClient.delete(`/users/${id}`);
+    return response.data;
+  },
+  toggleUserStatus: async (id: string, isActive: boolean) => {
+    const response = await apiClient.patch<{ data: User }>(
+      `/users/${id}/status`,
+      { isActive },
+    );
     return response.data;
   },
 };

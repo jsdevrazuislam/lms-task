@@ -58,7 +58,14 @@ export const CourseDetailHero = ({ course }: CourseDetailHeroProps) => {
             </span>
             <span className="flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5" />
-              Updated {course.updatedAt || course.createdAt}
+              Updated{" "}
+              {new Date(
+                course.updatedAt || course.createdAt,
+              ).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
             </span>
           </div>
         </div>

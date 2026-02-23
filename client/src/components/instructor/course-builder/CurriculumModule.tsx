@@ -18,7 +18,11 @@ export const CurriculumModule: React.FC<CurriculumModuleProps> = ({
   mIdx,
   removeModule,
 }) => {
-  const { register, control } = useFormContext<CourseFormValues>();
+  const {
+    register,
+    control,
+    formState: { errors },
+  } = useFormContext<CourseFormValues>();
   const {
     fields: lessonFields,
     append: appendLesson,
@@ -57,6 +61,11 @@ export const CurriculumModule: React.FC<CurriculumModuleProps> = ({
                 placeholder="Section Title"
                 {...register(`modules.${mIdx}.title`)}
               />
+              {errors.modules?.[mIdx]?.title && (
+                <p className="text-[10px] text-destructive font-bold">
+                  {errors.modules[mIdx]?.title?.message}
+                </p>
+              )}
             </div>
             <Button
               type="button"

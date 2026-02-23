@@ -9,16 +9,27 @@ import {
   TrendingUp,
   Edit3,
   Eye,
-  Archive,
   Filter,
   Star,
   ArrowUpDown,
+  Trash2,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useMemo, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useMemo } from "react";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { DataTable } from "@/components/shared/DataTable";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -79,20 +90,31 @@ function formatRevenue(value: number) {
 }
 
 const CoursesClient = () => {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<CourseStatus | "all">("all");
   const [sortKey, setSortKey] = useState<SortKey>("newest");
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  const { data: coursesData, isLoading: isCoursesLoading } =
-    useInstructorCourses();
+  const {
+    data: coursesData,
+    isLoading: isCoursesLoading,
+    handleDelete,
+  } = useInstructorCourses();
   const { data: statsData, isLoading: isStatsLoading } = useInstructorStats();
 
   const courses = useMemo(() => coursesData || [], [coursesData]);
 
-  const handleArchive = useCallback((id: string) => {
-    console.log("Archive course", id);
-  }, []);
+  const onDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    try {
+      await handleDelete(deleteTarget);
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error("Delete course failed", err);
+    }
+  };
 
   const filtered = useMemo(() => {
     let result = courses.filter((c) => {
@@ -207,20 +229,26 @@ const CoursesClient = () => {
               align="end"
               className="w-52 bg-popover border border-border shadow-elevated rounded-2xl p-2 z-50"
             >
-              <DropdownMenuItem className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer font-semibold text-sm">
+              <DropdownMenuItem
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer font-semibold text-sm"
+                onClick={() =>
+                  router.push(`/dashboard/instructor/courses/${course.id}/edit`)
+                }
+              >
                 <Edit3 className="w-4 h-4 text-muted-foreground" /> Edit Course
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer font-semibold text-sm">
+              <DropdownMenuItem
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer font-semibold text-sm"
+                onClick={() => window.open(`/courses/${course.id}`, "_blank")}
+              >
                 <Eye className="w-4 h-4 text-muted-foreground" /> View Details
               </DropdownMenuItem>
-              {course.status !== "archived" && (
-                <DropdownMenuItem
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer font-semibold text-sm text-destructive focus:bg-destructive/10"
-                  onClick={() => handleArchive(course.id)}
-                >
-                  <Archive className="w-4 h-4" /> Archive
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer font-semibold text-sm text-destructive"
+                onClick={() => setDeleteTarget(course.id)}
+              >
+                <Trash2 className="w-4 h-4" /> Delete Course
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -370,6 +398,32 @@ const CoursesClient = () => {
           }}
         />
       </div>
+
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold">
+              Are you sure?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              This action cannot be undone. This will permanently delete your
+              course and all its content.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={onDeleteConfirm}
+              className="bg-destructive hover:bg-destructive/90 text-white rounded-xl"
+            >
+              Delete Course
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

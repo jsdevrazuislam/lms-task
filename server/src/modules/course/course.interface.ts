@@ -8,11 +8,13 @@ import type {
 import { CourseStatus } from '@prisma/client';
 
 export interface ILesson {
+  id?: string;
   title: string;
   content?: string;
   videoUrl?: string;
   duration?: string;
   isFree?: boolean;
+  isPreview?: boolean;
   contentType?: 'video' | 'text' | 'quiz';
   order: number;
 }

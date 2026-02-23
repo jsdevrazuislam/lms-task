@@ -32,19 +32,19 @@ export const useAuth = () => {
 
     switch (role) {
       case "SUPER_ADMIN":
-        window.location.href = "/dashboard/super-admin";
+        router.push("/dashboard/super-admin");
         break;
       case "ADMIN":
-        window.location.href = "/dashboard/admin";
+        router.push("/dashboard/admin");
         break;
       case "INSTRUCTOR":
-        window.location.href = "/dashboard/instructor";
+        router.push("/dashboard/instructor");
         break;
       case "STUDENT":
-        window.location.href = "/dashboard/student";
+        router.push("/dashboard/student");
         break;
       default:
-        window.location.href = "/dashboard";
+        router.push("/dashboard");
     }
   };
 
@@ -102,8 +102,7 @@ export const useAuth = () => {
     } finally {
       dispatch(logoutAction());
       queryClient.clear();
-      // Use window.location.href to landing page to ensure middleware picks up cleared cookie
-      window.location.href = "/";
+      router.push("/");
     }
   };
 

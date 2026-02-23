@@ -88,16 +88,29 @@ export default function CoursesCatalogClient({
     }
   }, [selectedSort]);
 
-  const filters: FilterParams = {
-    ...(search.trim() ? { searchTerm: search.trim() } : {}),
-    ...(selectedCategoryId !== "All" ? { categoryId: selectedCategoryId } : {}),
-    ...(selectedLevel !== "All Levels" ? { level: selectedLevel } : {}),
-    ...(priceMax !== 1000 ? { maxPrice: priceMax } : {}),
-    ...(selectedRating ? { rating: selectedRating } : {}),
-    ...(page > 1 ? { page } : {}),
-    limit,
-    ...sortParams,
-  };
+  const filters: FilterParams = useMemo(
+    () => ({
+      ...(search.trim() ? { searchTerm: search.trim() } : {}),
+      ...(selectedCategoryId !== "All"
+        ? { categoryId: selectedCategoryId }
+        : {}),
+      ...(selectedLevel !== "All Levels" ? { level: selectedLevel } : {}),
+      ...(priceMax !== 1000 ? { maxPrice: priceMax } : {}),
+      ...(selectedRating ? { rating: selectedRating } : {}),
+      ...(page > 1 ? { page } : {}),
+      limit,
+      ...sortParams,
+    }),
+    [
+      search,
+      selectedCategoryId,
+      selectedLevel,
+      priceMax,
+      selectedRating,
+      page,
+      sortParams,
+    ],
+  );
 
   const { data: apiCategories } = useCategories({
     initialData: {

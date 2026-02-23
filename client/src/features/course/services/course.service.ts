@@ -66,7 +66,7 @@ export const courseService = {
 
   async updateCourse(
     id: string,
-    data: Partial<ICourse>,
+    data: CreateCoursePayload | Partial<ICourse>,
   ): Promise<CourseResponse> {
     const response = await apiClient.patch(`/courses/${id}`, data);
     return response.data;

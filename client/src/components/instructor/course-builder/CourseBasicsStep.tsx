@@ -125,24 +125,33 @@ export const CourseBasicsStep: React.FC<CourseBasicsStepProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between mb-2">
                   <Label htmlFor="price">Sale Price ($)</Label>
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor="isFree" className="text-xs cursor-pointer">
-                      Free Course
-                    </Label>
-                    <Switch
-                      id="isFree"
-                      checked={isFree}
-                      onCheckedChange={(val) => {
-                        setValue("isFree", val);
-                        if (val) {
-                          setValue("price", 0, { shouldValidate: true });
-                          setValue("originalPrice", 0, {
-                            shouldValidate: true,
-                          });
-                        }
-                      }}
-                    />
-                  </div>
+                  <FormField
+                    control={control}
+                    name="isFree"
+                    render={({ field }) => (
+                      <div className="flex items-center gap-2">
+                        <Label
+                          htmlFor="isFree"
+                          className="text-xs cursor-pointer"
+                        >
+                          Free Course
+                        </Label>
+                        <Switch
+                          id="isFree"
+                          checked={field.value}
+                          onCheckedChange={(val) => {
+                            field.onChange(val);
+                            if (val) {
+                              setValue("price", 0, { shouldValidate: true });
+                              setValue("originalPrice", 0, {
+                                shouldValidate: true,
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                    )}
+                  />
                 </div>
                 <Input
                   id="price"

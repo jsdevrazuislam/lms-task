@@ -25,7 +25,7 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     limit: query.limit ? Number(query.limit) : undefined,
   } as IUserFilterRequest;
 
-  const result = await userService.getAllUsers(filters);
+  const result = await userService.getAllUsers(filters, req.user);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -73,9 +73,23 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const toggleUserStatus = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { isActive } = req.body;
+  const result = await userService.toggleUserStatus(id as string, isActive);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
+    data: result,
+  });
+});
+
 export const userController = {
   getAllUsers,
   getSingleUser,
   updateUserRole,
   deleteUser,
+  toggleUserStatus,
 };

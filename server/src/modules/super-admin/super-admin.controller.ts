@@ -105,11 +105,13 @@ const overrideCourseStatus = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getAnalyticsOverview = catchAsync(async (req: Request, res: Response) => {
-  const [topCourses, userGrowth, categoryDistribution] = await Promise.all([
-    superAdminService.getTopCourses(),
-    superAdminService.getUserGrowth(),
-    superAdminService.getCategoryDistribution(),
-  ]);
+  const [topCourses, userGrowth, categoryDistribution, enrollmentGrowth] =
+    await Promise.all([
+      superAdminService.getTopCourses(),
+      superAdminService.getUserGrowth(),
+      superAdminService.getCategoryDistribution(),
+      superAdminService.getEnrollmentGrowth(),
+    ]);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -119,6 +121,7 @@ const getAnalyticsOverview = catchAsync(async (req: Request, res: Response) => {
       topCourses,
       userGrowth,
       categoryDistribution,
+      enrollmentGrowth,
     },
   });
 });

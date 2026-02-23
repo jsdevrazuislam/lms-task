@@ -7,6 +7,8 @@ interface AddCourseFooterProps {
   totalSteps: number;
   prevStep: () => void;
   nextStep: () => void;
+  isEditMode?: boolean;
+  isSubmitting?: boolean;
 }
 
 export const AddCourseFooter: React.FC<AddCourseFooterProps> = ({
@@ -14,6 +16,8 @@ export const AddCourseFooter: React.FC<AddCourseFooterProps> = ({
   totalSteps,
   prevStep,
   nextStep,
+  isEditMode,
+  isSubmitting,
 }) => {
   return (
     <div className="flex items-center justify-between py-8 px-6 bg-card rounded-2xl border">
@@ -21,7 +25,7 @@ export const AddCourseFooter: React.FC<AddCourseFooterProps> = ({
         type="button"
         variant="outline"
         onClick={prevStep}
-        disabled={activeStep === 0}
+        disabled={activeStep === 0 || isSubmitting}
         size="lg"
         className="rounded-xl px-8"
       >
@@ -43,19 +47,46 @@ export const AddCourseFooter: React.FC<AddCourseFooterProps> = ({
         </div>
       </div>
 
-      {activeStep < totalSteps - 1 ? (
-        <Button
-          type="button"
-          onClick={nextStep}
-          size="lg"
-          className="rounded-xl px-10 shadow-lg shadow-primary/25"
-        >
-          Continue
-          <ChevronRight className="w-4 h-4 ml-2" />
-        </Button>
-      ) : (
-        <div className="w-[100px] hidden sm:block" />
-      )}
+      <div className="flex items-center gap-3">
+        {isEditMode && (
+          <Button
+            type="submit"
+            size="lg"
+            variant="outline"
+            disabled={isSubmitting}
+            className="rounded-xl px-8 border-primary text-primary hover:bg-primary/5"
+          >
+            {isSubmitting ? "Saving..." : "Save Changes"}
+          </Button>
+        )}
+
+        {activeStep < totalSteps - 1 ? (
+          <Button
+            type="button"
+            onClick={nextStep}
+            size="lg"
+            className="rounded-xl px-10 shadow-lg shadow-primary/25"
+          >
+            Continue
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            size="lg"
+            disabled={isSubmitting}
+            className="rounded-xl px-10 shadow-lg shadow-primary/25"
+          >
+            {isSubmitting
+              ? isEditMode
+                ? "Saving..."
+                : "Publishing..."
+              : isEditMode
+                ? "Save & Exit"
+                : "Publish Course"}
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

@@ -2,7 +2,8 @@
 
 import { PlayCircle, ChevronDown, ChevronUp, Play, Lock } from "lucide-react";
 import { useState } from "react";
-import { ICurriculumSection } from "@/features/course/types";
+import { ICurriculumSection, ICurriculumItem } from "@/features/course/types";
+import { PreviewModal } from "./PreviewModal";
 
 interface CourseCurriculumProps {
   curriculum: ICurriculumSection[];
@@ -16,6 +17,7 @@ export const CourseCurriculum = ({
   totalDuration,
 }: CourseCurriculumProps) => {
   const [openSection, setOpenSection] = useState<number | null>(0);
+  const [previewItem, setPreviewItem] = useState<ICurriculumItem | null>(null);
 
   return (
     <div className="p-6 rounded-2xl border border-border bg-card">
@@ -78,9 +80,15 @@ export const CourseCurriculum = ({
                         {item.title}
                       </span>
                       {item.isFree && (
-                        <span className="badge-success text-[10px]">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewItem(item);
+                          }}
+                          className="badge-success text-[10px] cursor-pointer hover:bg-success/20 transition-colors"
+                        >
                           Preview
-                        </span>
+                        </button>
                       )}
                     </div>
                     <span className="text-xs text-muted-foreground">
@@ -93,6 +101,13 @@ export const CourseCurriculum = ({
           </div>
         ))}
       </div>
+
+      <PreviewModal
+        isOpen={!!previewItem}
+        onClose={() => setPreviewItem(null)}
+        title={previewItem?.title || ""}
+        videoUrl={previewItem?.videoUrl}
+      />
     </div>
   );
 };

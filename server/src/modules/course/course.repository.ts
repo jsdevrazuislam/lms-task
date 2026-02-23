@@ -34,7 +34,7 @@ const create = async (instructorId: string, data: ICreateCourse) => {
             videoUrl: lesson.videoUrl ?? null,
             contentType: lesson.contentType ?? 'video',
             duration: lesson.duration ?? null,
-            isFree: lesson.isFree ?? false,
+            isFree: lesson.isPreview ?? lesson.isFree ?? false,
             order: lesson.order,
           })),
         },
@@ -224,14 +224,132 @@ const findById = async (id: string) => {
 };
 
 const update = async (id: string, data: IUpdateCourse) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { modules, ...updateData } = data;
-  return prisma.course.update({
-    where: { id },
-    data: updateData as Prisma.CourseUpdateInput,
-    include: {
-      category: true,
-    },
+  const { modules, categoryId, ...updateData } = data;
+
+  return prisma.$transaction(async (tx) => {
+    // 1. Update basic course info
+    const updatedCourse = await tx.course.update({
+      where: { id },
+      data: {
+        ...(updateData as Prisma.CourseUpdateInput),
+        ...(categoryId && { category: { connect: { id: categoryId } } }),
+      },
+      include: {
+        category: true,
+      },
+    });
+
+    if (modules) {
+      // 2. Handle Modules Sync
+      // Get existing modules to identify what to delete
+      const existingModules = await tx.module.findMany({
+        where: { courseId: id, isDeleted: false },
+        select: { id: true },
+      });
+
+      const payloadModuleIds = modules
+        .map((m) => m.id)
+        .filter(Boolean) as string[];
+      const modulesToDelete = existingModules.filter(
+        (em) => !payloadModuleIds.includes(em.id)
+      );
+
+      // Soft delete modules not in payload
+      if (modulesToDelete.length > 0) {
+        await tx.module.updateMany({
+          where: { id: { in: modulesToDelete.map((m) => m.id) } },
+          data: { isDeleted: true },
+        });
+        // Also lessons of these modules
+        await tx.lesson.updateMany({
+          where: { moduleId: { in: modulesToDelete.map((m) => m.id) } },
+          data: { isDeleted: true },
+        });
+      }
+
+      for (const m of modules) {
+        if (m.id && payloadModuleIds.includes(m.id)) {
+          // Update existing module
+          await tx.module.update({
+            where: { id: m.id },
+            data: {
+              title: m.title,
+              order: m.order,
+              duration: m.duration || null,
+            },
+          });
+
+          // Handle lessons in this module
+          const existingLessons = await tx.lesson.findMany({
+            where: { moduleId: m.id, isDeleted: false },
+            select: { id: true },
+          });
+
+          const payloadLessonIds = m.lessons
+            .map((l) => l.id)
+            .filter(Boolean) as string[];
+          const lessonsToDelete = existingLessons.filter(
+            (el) => !payloadLessonIds.includes(el.id)
+          );
+
+          if (lessonsToDelete.length > 0) {
+            await tx.lesson.updateMany({
+              where: { id: { in: lessonsToDelete.map((l) => l.id) } },
+              data: { isDeleted: true },
+            });
+          }
+
+          for (const l of m.lessons) {
+            const lessonData = {
+              title: l.title,
+              content: l.content ?? null,
+              videoUrl: l.videoUrl ?? null,
+              contentType: l.contentType ?? 'video',
+              duration: l.duration ?? null,
+              isFree: l.isPreview ?? l.isFree ?? false,
+              order: l.order,
+            };
+
+            if (l.id && payloadLessonIds.includes(l.id)) {
+              await tx.lesson.update({
+                where: { id: l.id },
+                data: lessonData,
+              });
+            } else {
+              await tx.lesson.create({
+                data: {
+                  ...lessonData,
+                  moduleId: m.id,
+                },
+              });
+            }
+          }
+        } else {
+          // Create new module
+          await tx.module.create({
+            data: {
+              title: m.title,
+              order: m.order,
+              duration: m.duration || null,
+              courseId: id,
+              lessons: {
+                create: m.lessons.map((l) => ({
+                  title: l.title,
+                  content: l.content ?? null,
+                  videoUrl: l.videoUrl ?? null,
+                  contentType: l.contentType ?? 'video',
+                  duration: l.duration ?? null,
+                  isFree: l.isPreview ?? l.isFree ?? false,
+                  order: l.order,
+                })),
+              },
+            },
+          });
+        }
+      }
+    }
+
+    return updatedCourse;
   });
 };
 

@@ -1,6 +1,9 @@
 import { CourseStatus, PaymentStatus, UserRole, Prisma } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
+import config from '../../config/index.js';
 import prisma from '../../config/prisma.js';
+import { AnalyticsService } from '../analytics/analytics.service.js';
 
 import type {
   IAdminCreationData,
@@ -98,6 +101,7 @@ const getAllAdmins = async (page = 1, limit = 10, cursor?: string) => {
       email: true,
       firstName: true,
       lastName: true,
+      isActive: true,
       createdAt: true,
     },
     take: take + 1,
@@ -240,10 +244,18 @@ const getAllCourses = async (page = 1, limit = 10, cursor?: string) => {
  * Create a new Admin
  */
 const createAdmin = async (data: IAdminCreationData) => {
+  const hashedPassword = await bcrypt.hash(
+    data.password,
+    Number(config.bcrypt_salt_rounds)
+  );
+
   return prisma.user.create({
     data: {
       ...data,
+      password: hashedPassword,
       role: UserRole.ADMIN,
+      isActive: true,
+      isVerified: true,
     },
     select: {
       id: true,
@@ -251,6 +263,8 @@ const createAdmin = async (data: IAdminCreationData) => {
       firstName: true,
       lastName: true,
       role: true,
+      isActive: true,
+      isVerified: true,
     },
   });
 };
@@ -300,37 +314,6 @@ const updateSettings = async (data: IPlatformSettingsData) => {
     where: { id: settings.id },
     data,
   });
-};
-
-/**
- * Get top performing courses
- */
-const getTopCourses = async (limit = 5) => {
-  return prisma.course
-    .findMany({
-      where: { isDeleted: false, status: 'PUBLISHED' },
-      include: {
-        instructor: { select: { firstName: true, lastName: true } },
-        _count: { select: { enrollments: true } },
-        payments: {
-          where: { status: PaymentStatus.SUCCESS },
-          select: { amount: true },
-        },
-      },
-      take: limit,
-      // The sorting by revenue/enrollments logic
-    })
-    .then((courses) => {
-      return courses
-        .map((course) => ({
-          id: course.id,
-          title: course.title,
-          instructor: `${course.instructor.firstName} ${course.instructor.lastName}`,
-          enrollments: course._count.enrollments,
-          revenue: course.payments.reduce((sum, p) => sum + p.amount, 0),
-        }))
-        .sort((a, b) => b.revenue - a.revenue);
-    });
 };
 
 /**
@@ -413,9 +396,18 @@ const getCategoryDistribution = async () => {
 };
 
 const updateAdmin = async (id: string, data: IAdminUpdateData) => {
+  const updateData = { ...data };
+
+  if (data.password) {
+    updateData.password = await bcrypt.hash(
+      data.password,
+      Number(config.bcrypt_salt_rounds)
+    );
+  }
+
   return prisma.user.update({
     where: { id, role: UserRole.ADMIN },
-    data,
+    data: updateData,
   });
 };
 
@@ -454,9 +446,10 @@ export const superAdminService = {
   overrideCourseStatus,
   updateSettings,
   getSettings,
-  getTopCourses,
   getUserGrowth,
   getCategoryDistribution,
   toggleUserStatus,
   deleteUser,
+  getEnrollmentGrowth: AnalyticsService.getEnrollmentGrowth,
+  getTopCourses: AnalyticsService.getTopCourses,
 };

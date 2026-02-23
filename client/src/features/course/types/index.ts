@@ -26,6 +26,7 @@ export interface ICurriculumItem {
   title: string;
   duration: string;
   isFree: boolean;
+  videoUrl?: string;
   contentType?: "video" | "text" | "quiz";
   order: number;
 }
@@ -66,6 +67,7 @@ export interface ICourse {
   tagColor?: string;
   curriculum?: ICurriculumSection[];
   modules?: IModule[];
+  promoVideoUrl?: string;
   metaDescription?: string;
   instructor?: {
     id: string;

@@ -98,11 +98,18 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
               {lIdx + 1}
             </div>
             <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-              <Input
-                className="h-8 border-none bg-transparent focus-visible:ring-0 px-0 font-medium"
-                placeholder="Lesson Title"
-                {...register(`modules.${mIdx}.lessons.${lIdx}.title`)}
-              />
+              <div className="flex-1">
+                <Input
+                  className="h-8 border-none bg-transparent focus-visible:ring-0 px-0 font-medium"
+                  placeholder="Lesson Title"
+                  {...register(`modules.${mIdx}.lessons.${lIdx}.title`)}
+                />
+                {errors.modules?.[mIdx]?.lessons?.[lIdx]?.title && (
+                  <p className="text-[10px] text-destructive font-bold">
+                    {errors.modules[mIdx]?.lessons?.[lIdx]?.title?.message}
+                  </p>
+                )}
+              </div>
               <div className="flex items-center gap-3 ml-auto">
                 <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-md">
                   {contentType === "text" ? (

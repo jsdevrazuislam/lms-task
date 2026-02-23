@@ -27,6 +27,10 @@ export interface ISuperAdminAnalytics {
     name: string;
     revenue: number;
   }[];
+  enrollmentGrowth: {
+    date: string;
+    count: number;
+  }[];
 }
 
 export const superAdminService = {

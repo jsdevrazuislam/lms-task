@@ -37,6 +37,8 @@ const router = express.Router();
  *             properties:
  *               title:
  *                 type: string
+ *               subtitle:
+ *                 type: string
  *               description:
  *                 type: string
  *               thumbnail:
@@ -45,9 +47,32 @@ const router = express.Router();
  *                 type: number
  *               categoryId:
  *                 type: string
+ *               duration:
+ *                 type: string
+ *               level:
+ *                 type: string
+ *                 enum: [BEGINNER, INTERMEDIATE, ADVANCED]
  *               status:
  *                 type: string
  *                 enum: [DRAFT, PUBLISHED, ARCHIVED]
+ *               modules:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     title: { type: string }
+ *                     order: { type: number }
+ *                     lessons:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           title: { type: string }
+ *                           contentType: { type: string, enum: [video, text, quiz] }
+ *                           isPreview: { type: boolean }
+ *                           videoUrl: { type: string }
+ *                           content: { type: string }
+ *                           order: { type: number }
  *     responses:
  *       201:
  *         description: Course created successfully
@@ -220,6 +245,8 @@ router.get('/:id', courseController.getCourseById);
  *             properties:
  *               title:
  *                 type: string
+ *               subtitle:
+ *                 type: string
  *               description:
  *                 type: string
  *               thumbnail:
@@ -228,9 +255,34 @@ router.get('/:id', courseController.getCourseById);
  *                 type: number
  *               categoryId:
  *                 type: string
+ *               duration:
+ *                 type: string
+ *               level:
+ *                 type: string
+ *                 enum: [BEGINNER, INTERMEDIATE, ADVANCED]
  *               status:
  *                 type: string
  *                 enum: [DRAFT, PUBLISHED, ARCHIVED]
+ *               modules:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     id: { type: string }
+ *                     title: { type: string }
+ *                     order: { type: number }
+ *                     lessons:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id: { type: string }
+ *                           title: { type: string }
+ *                           contentType: { type: string, enum: [video, text, quiz] }
+ *                           isPreview: { type: boolean }
+ *                           videoUrl: { type: string }
+ *                           content: { type: string }
+ *                           order: { type: number }
  *     responses:
  *       200:
  *         description: Course updated successfully
