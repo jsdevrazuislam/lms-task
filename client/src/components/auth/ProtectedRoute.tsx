@@ -1,39 +1,47 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
-import { UserRole } from '@/features/auth/types';
-import { useAppSelector } from '@/store';
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { UserRole } from "@/features/auth/types";
 
 interface ProtectedRouteProps {
-    children: React.ReactNode;
-    allowedRoles?: UserRole[];
+  children: React.ReactNode;
+  allowedRoles?: UserRole[];
 }
 
-export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-    const { user, isAuthenticated, isLoading } = useAppSelector((state) => state.auth);
-    const router = useRouter();
+export default function ProtectedRoute({
+  children,
+  allowedRoles,
+}: ProtectedRouteProps) {
+  const { user, isAuthenticated, isInitialized } = useAuth();
+  const router = useRouter();
 
-    useEffect(() => {
-        if (!isLoading) {
-            if (!isAuthenticated) {
-                router.replace('/login');
-            } else if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-                router.replace('/unauthorized');
-            }
-        }
-    }, [isAuthenticated, isLoading, user, allowedRoles, router]);
-
-    if (isLoading) {
-        return (
-            <div className="flex h-screen w-full items-center justify-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-            </div>
-        );
+  useEffect(() => {
+    // No client-side redirect logic here as it's handled by middleware
+    // This component only handles unauthorized role access or localized loading UI
+    if (isInitialized && isAuthenticated) {
+      if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+        router.replace("/unauthorized");
+      }
     }
+  }, [isAuthenticated, isInitialized, user, allowedRoles, router]);
 
-    if (!isAuthenticated) return null;
-    if (allowedRoles && user && !allowedRoles.includes(user.role)) return null;
+  if (!isInitialized) {
+    return (
+      <div className="flex h-[70vh] w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" />
+          <p className="text-xs font-semibold text-muted-foreground animate-pulse uppercase tracking-widest">
+            Authenticating...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-    return <>{children}</>;
+  if (!isAuthenticated) return null;
+  if (allowedRoles && user && !allowedRoles.includes(user.role)) return null;
+
+  return <>{children}</>;
 }

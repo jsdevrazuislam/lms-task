@@ -23,6 +23,12 @@ export const tokenUtils = {
   setToken: (token: string, remember: boolean = false): void => {
     if (typeof window === "undefined") return;
 
+    // Cookie sync for middleware (Next.js proxy)
+    const expiry = remember
+      ? `; max-age=${30 * 24 * 60 * 60}; path=/` // 30 days
+      : "; path=/";
+    document.cookie = `${TOKEN_KEY}=${token}${expiry}; samesite=lax`;
+
     if (remember) {
       localStorage.setItem(TOKEN_KEY, token);
       localStorage.setItem(REMEMBER_KEY, "true");
@@ -39,6 +45,10 @@ export const tokenUtils = {
    */
   clearToken: (): void => {
     if (typeof window === "undefined") return;
+
+    // Clear cookie
+    document.cookie = `${TOKEN_KEY}=; max-age=0; path=/; samesite=lax`;
+
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REMEMBER_KEY);
     sessionStorage.removeItem(TOKEN_KEY);

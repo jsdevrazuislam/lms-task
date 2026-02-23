@@ -1,12 +1,20 @@
-"use client";
 import { ArrowRight, Star } from "lucide-react";
 import Link from "next/link";
 import { CourseCard } from "@/components/courses/CourseCard";
-import { usePopularCourses } from "@/features/course/hooks/usePopularCourses";
+import { courseService } from "@/features/course/services/course.service";
 import { ICourse } from "@/features/course/types";
 
-export function CourseSection() {
-  const { data: popularData, isLoading, isError } = usePopularCourses();
+export async function CourseSection() {
+  let popularCourses: ICourse[] = [];
+  let isError = false;
+
+  try {
+    const popularData = await courseService.getPopularCourses();
+    popularCourses = popularData?.data || [];
+  } catch (error) {
+    console.error("Error fetching popular courses:", error);
+    isError = true;
+  }
 
   if (isError) {
     return (
@@ -19,19 +27,11 @@ export function CourseSection() {
             <p className="text-muted-foreground mb-6">
               We couldn&apos;t load the popular courses at this time.
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-2 rounded-xl bg-primary text-white font-semibold hover:opacity-90 transition-all"
-            >
-              Retry Loading
-            </button>
           </div>
         </div>
       </div>
     );
   }
-
-  const popularCourses = popularData?.data || [];
 
   return (
     <section className="py-24 bg-background relative overflow-hidden">
@@ -60,22 +60,7 @@ export function CourseSection() {
           </Link>
         </div>
 
-        {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div
-                key={i}
-                className="rounded-2xl border border-border bg-card p-4 space-y-4 shadow-sm animate-pulse"
-              >
-                <div className="h-32 w-full bg-muted rounded-xl" />
-                <div className="space-y-3">
-                  <div className="h-4 w-3/4 bg-muted rounded" />
-                  <div className="h-3 w-1/2 bg-muted rounded" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : popularCourses.length === 0 ? (
+        {popularCourses.length === 0 ? (
           <div className="py-12 px-4 rounded-3xl border border-dashed border-border bg-muted/20 flex flex-col items-center text-center">
             <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4">
               <Star className="w-8 h-8 text-muted-foreground/30" />
@@ -90,8 +75,12 @@ export function CourseSection() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {popularCourses.map((course: ICourse) => (
-              <CourseCard key={course.id} course={course} />
+            {popularCourses.map((course: ICourse, index: number) => (
+              <CourseCard
+                key={course.id}
+                course={course}
+                priority={index < 2} // Priority for top 2 visible cards
+              />
             ))}
           </div>
         )}

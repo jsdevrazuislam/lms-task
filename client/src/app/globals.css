@@ -79,15 +79,15 @@
   --popover: #ffffff;
   --popover-foreground: #0f172a;
 
-  /* Primary: Indigo */
-  --primary: #6366f1;
+  /* Primary: Darker Indigo for A11y Contrast (4.5:1+) */
+  --primary: #4338ca;
   --primary-foreground: #ffffff;
-  --primary-hover: #4f46e5;
+  --primary-hover: #3730a3;
   --primary-muted: #eef2ff;
-  --primary-glow: #6366f1;
+  --primary-glow: #4338ca;
 
-  /* Secondary: Emerald */
-  --secondary: #10b981;
+  /* Secondary: Darker Emerald */
+  --secondary: #059669;
   --secondary-foreground: #ffffff;
   --secondary-muted: #ecfdf5;
 

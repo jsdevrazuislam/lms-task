@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAppSelector } from "@/store";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 interface RoleGuardProps {
   children: React.ReactNode;
@@ -11,13 +11,11 @@ interface RoleGuardProps {
 }
 
 export const RoleGuard = ({ children, allowedRoles }: RoleGuardProps) => {
-  const { user, isAuthenticated, isLoading } = useAppSelector(
-    (state) => state.auth,
-  );
+  const { user, isAuthenticated, isInitialized } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading) {
+    if (isInitialized) {
       if (!isAuthenticated) {
         router.push("/login");
       } else if (user && !allowedRoles.includes(user.role)) {
@@ -38,9 +36,9 @@ export const RoleGuard = ({ children, allowedRoles }: RoleGuardProps) => {
         }
       }
     }
-  }, [user, isAuthenticated, isLoading, allowedRoles, router]);
+  }, [user, isAuthenticated, isInitialized, allowedRoles, router]);
 
-  if (isLoading) {
+  if (!isInitialized) {
     return (
       <div className="p-8 space-y-4">
         <Skeleton className="h-8 w-64" />

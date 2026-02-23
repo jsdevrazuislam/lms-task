@@ -155,10 +155,7 @@ const RevenueClient = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            className="h-12 px-6 rounded-xl font-bold gap-2 shadow-sm border-border"
-          >
+          <Button className="h-12 px-6 rounded-xl font-bold gap-2">
             <CreditCard className="w-5 h-5 opacity-70" /> Payout Settings
           </Button>
         </div>

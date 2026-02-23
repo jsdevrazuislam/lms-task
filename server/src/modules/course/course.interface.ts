@@ -39,6 +39,7 @@ export interface ICreateCourse {
   requirements?: string[];
   level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   rating?: number;
+  isFree?: boolean;
   metaDescription?: string;
   status?: CourseStatus;
   modules?: IModule[];

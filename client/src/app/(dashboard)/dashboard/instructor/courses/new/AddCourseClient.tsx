@@ -154,7 +154,6 @@ export default function AddCourseClient() {
               .filter(Boolean)
           : data.requirements,
       metaDescription: data.metaDescription,
-      status: "PUBLISHED",
       modules: data.modules.map((m, mIdx) => ({
         title: m.title,
         order: mIdx + 1,

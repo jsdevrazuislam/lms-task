@@ -1,12 +1,23 @@
 import type { Metadata } from "next";
 
-import { CTA } from "@/components/landing/CTA";
+import dynamic from "next/dynamic";
 import { CourseSection } from "@/components/landing/CourseSection";
-import { Features } from "@/components/landing/Features";
 import { Hero } from "@/components/landing/Hero";
-import { Pricing } from "@/components/landing/Pricing";
 import { Stats } from "@/components/landing/Stats";
-import { Testimonials } from "@/components/landing/Testimonials";
+
+// Below-the-fold components are loaded dynamically
+const Features = dynamic(() =>
+  import("@/components/landing/Features").then((mod) => mod.Features),
+);
+const Testimonials = dynamic(() =>
+  import("@/components/landing/Testimonials").then((mod) => mod.Testimonials),
+);
+const Pricing = dynamic(() =>
+  import("@/components/landing/Pricing").then((mod) => mod.Pricing),
+);
+const CTA = dynamic(() =>
+  import("@/components/landing/CTA").then((mod) => mod.CTA),
+);
 
 export const metadata: Metadata = {
   title: "LearnFlow | AI-Powered Learning Management System",

@@ -131,29 +131,48 @@ const findAll = async (filters: ICourseFilterRequest) => {
   const queryOptions: Prisma.CourseFindManyArgs = {
     where: whereConditions,
     take: take + 1,
-    orderBy: { [sortBy]: sortOrder },
-    include: {
-      category: true,
-      instructor: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          email: true,
-        },
-      },
-      _count: {
-        select: { enrollments: true },
-      },
-    },
+    skip: (Number(page) - 1) * Number(limit),
   };
+
+  // Advanced Sorting Logic
+  if (sortBy === 'Most Popular') {
+    queryOptions.orderBy = [
+      { enrollments: { _count: 'desc' } },
+      { createdAt: 'desc' },
+    ];
+  } else if (sortBy === 'Highest Rated') {
+    queryOptions.orderBy = [{ rating: 'desc' }, { createdAt: 'desc' }];
+  } else if (sortBy === 'Price: Low–High') {
+    queryOptions.orderBy = { price: 'asc' };
+  } else if (sortBy === 'Price: High–Low') {
+    queryOptions.orderBy = { price: 'desc' };
+  } else if (sortBy === 'Newest') {
+    queryOptions.orderBy = { createdAt: 'desc' };
+  } else {
+    // Default or direct field sort
+    queryOptions.orderBy = { [sortBy]: sortOrder as Prisma.SortOrder };
+  }
 
   if (cursor) {
     queryOptions.cursor = { id: cursor };
     queryOptions.skip = 1;
-  } else {
-    queryOptions.skip = (Number(page) - 1) * Number(limit);
   }
+
+  // Ensure include is present (it was removed from queryOptions above to structure sorting better)
+  queryOptions.include = {
+    category: true,
+    instructor: {
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+      },
+    },
+    _count: {
+      select: { enrollments: true },
+    },
+  };
 
   const [result, total] = await Promise.all([
     prisma.course.findMany(queryOptions),

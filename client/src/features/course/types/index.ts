@@ -120,7 +120,7 @@ export interface CreateCoursePayload {
   whatYouLearn?: string[];
   requirements?: string[];
   metaDescription?: string;
-  status: ICourse["status"];
+  status?: ICourse["status"];
   modules: {
     title: string;
     order: number;

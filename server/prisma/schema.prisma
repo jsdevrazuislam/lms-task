@@ -66,6 +66,7 @@ model Course {
   updatedAt       DateTime     @updatedAt
   duration        String?
   level           CourseLevel  @default(BEGINNER)
+  isFree          Boolean      @default(false)
   originalPrice   Float?
   rating          Float        @default(0)
   requirements    String[]     @default([])
@@ -142,8 +143,8 @@ model Enrollment {
   status     EnrollmentStatus @default(ACTIVE)
   enrolledAt DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
-  course     Course           @relation(fields: [courseId], references: [id])
-  student    User             @relation(fields: [studentId], references: [id])
+  course     Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  student    User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
   payment    Payment?
 
   @@unique([studentId, courseId])
@@ -169,9 +170,9 @@ model Payment {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  student    User       @relation(fields: [studentId], references: [id])
-  course     Course     @relation(fields: [courseId], references: [id])
-  enrollment Enrollment @relation(fields: [enrollmentId], references: [id])
+  student    User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course     Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }
@@ -192,8 +193,8 @@ model Review {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  student User   @relation(fields: [studentId], references: [id])
-  course  Course @relation(fields: [courseId], references: [id])
+  student User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, courseId])
   @@map("reviews")
@@ -205,8 +206,8 @@ model LessonProgress {
   lessonId    String
   isCompleted Boolean   @default(false)
   completedAt DateTime?
-  lesson      Lesson    @relation(fields: [lessonId], references: [id])
-  student     User      @relation(fields: [studentId], references: [id])
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  student     User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, lessonId])
   @@index([isCompleted])

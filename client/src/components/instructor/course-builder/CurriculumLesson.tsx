@@ -114,7 +114,7 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
                     control={control}
                     name={`modules.${mIdx}.lessons.${lIdx}.contentType`}
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="space-y-0!">
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}

@@ -51,8 +51,15 @@ export const CatalogHero = ({ search, onSearchChange }: CatalogHeroProps) => {
 
         {/* Hero Search */}
         <div className="max-w-2xl mx-auto relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <label htmlFor="course-search" className="sr-only">
+            Search courses
+          </label>
+          <Search
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground"
+            aria-hidden="true"
+          />
           <input
+            id="course-search"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             type="text"
@@ -66,9 +73,10 @@ export const CatalogHero = ({ search, onSearchChange }: CatalogHeroProps) => {
           {featuredBanners.map(({ icon: Icon, label, color, bg }) => (
             <button
               key={label}
+              aria-label={`Filter by ${label}`}
               className={`flex items-center gap-2 px-4 py-2 rounded-full ${bg} text-white/80 text-sm font-medium border border-white/10 hover:bg-white/20 transition-colors`}
             >
-              <Icon className={`w-4 h-4 ${color}`} />
+              <Icon className={`w-4 h-4 ${color}`} aria-hidden="true" />
               {label}
             </button>
           ))}

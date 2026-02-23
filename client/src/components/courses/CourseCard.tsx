@@ -8,9 +8,14 @@ import { ICourse } from "@/features/course/types";
 interface CourseCardProps {
   course: ICourse;
   variant?: "grid" | "list";
+  priority?: boolean;
 }
 
-export const CourseCard = ({ course, variant = "grid" }: CourseCardProps) => {
+export const CourseCard = ({
+  course,
+  variant = "grid",
+  priority = false,
+}: CourseCardProps) => {
   const isList = variant === "list";
 
   // Support both ID and _id depending on API response
@@ -27,22 +32,22 @@ export const CourseCard = ({ course, variant = "grid" }: CourseCardProps) => {
         isList ? "flex flex-col sm:flex-row" : "flex flex-col"
       }`}
     >
-      {/* Thumbnail */}
       <div
-        className={`relative flex items-center justify-center bg-linear-to-br ${
+        className={`relative flex items-center justify-center bg-linear-to-br overflow-hidden rounded-t-2xl aspect-video ${
           course.gradient || "from-primary/10 to-primary/5"
-        } ${isList ? "h-48 w-full sm:h-auto sm:w-64" : "h-44 w-full"}`}
+        } ${isList ? "w-full sm:w-64" : "w-full"}`}
       >
         <CustomImage
           src={thumbnail || "/placeholder-course.png"}
           alt={course.title}
           fill
+          priority={priority}
           containerClassName="absolute inset-0"
           className="transition-transform duration-500 group-hover:scale-110"
           sizes={
             isList
               ? "(max-width: 640px) 100vw, 256px"
-              : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 350px"
           }
           fallbackIcon={<BookOpen className="h-10 w-10 text-primary/40" />}
         />

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 interface CustomImageProps extends Omit<ImageProps, "onLoad" | "onError"> {
   fallbackIcon?: React.ReactNode;
   containerClassName?: string;
+  priority?: boolean;
 }
 
 export function CustomImage({
@@ -17,9 +18,10 @@ export function CustomImage({
   className,
   containerClassName,
   fallbackIcon,
+  priority,
   ...props
 }: CustomImageProps) {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!priority);
   const [hasError, setHasError] = useState(false);
 
   return (
@@ -46,6 +48,7 @@ export function CustomImage({
           {...props}
           src={src}
           alt={alt}
+          priority={priority}
           onLoad={() => setIsLoading(false)}
           onError={() => {
             setHasError(true);
@@ -54,7 +57,9 @@ export function CustomImage({
           className={cn(
             "transition-all duration-500 w-full h-full",
             props.fill ? "object-cover" : "",
-            isLoading ? "opacity-0 scale-105" : "opacity-100 scale-100",
+            isLoading && !priority
+              ? "opacity-0 scale-105"
+              : "opacity-100 scale-100",
             className,
           )}
         />

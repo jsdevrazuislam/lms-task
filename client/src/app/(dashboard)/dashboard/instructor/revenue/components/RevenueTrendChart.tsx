@@ -64,75 +64,77 @@ const RevenueTrendChart = ({ data }: RevenueTrendChartProps) => {
     );
   }
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <AreaChart
-        data={data}
-        margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-      >
-        <defs>
-          <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.25} />
-            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <CartesianGrid
-          strokeDasharray="3 3"
-          stroke="var(--border)"
-          vertical={false}
-        />
-        <XAxis
-          dataKey="name"
-          tick={{
-            fontSize: 11,
-            fontWeight: 600,
-            fill: "var(--muted-foreground)",
-          }}
-          axisLine={false}
-          tickLine={false}
-          dy={10}
-        />
-        <YAxis
-          tickFormatter={(v) =>
-            `$${v >= 1000 ? (v / 1000).toFixed(0) + "k" : v}`
-          }
-          tick={{
-            fontSize: 11,
-            fontWeight: 600,
-            fill: "var(--muted-foreground)",
-          }}
-          axisLine={false}
-          tickLine={false}
-          dx={-10}
-        />
-        <Tooltip
-          content={<CustomTooltip />}
-          cursor={{
-            stroke: "var(--primary)",
-            strokeWidth: 1,
-            strokeDasharray: "4 4",
-          }}
-        />
-        <Area
-          type="monotone"
-          dataKey="revenue"
-          stroke="var(--primary)"
-          strokeWidth={3}
-          fill="url(#revenueGrad)"
-          dot={{
-            r: 4,
-            fill: "var(--background)",
-            stroke: "var(--primary)",
-            strokeWidth: 2,
-          }}
-          activeDot={{
-            r: 6,
-            fill: "var(--primary)",
-            stroke: "var(--background)",
-            strokeWidth: 2,
-          }}
-        />
-      </AreaChart>
-    </ResponsiveContainer>
+    <div className="w-full h-[320px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart
+          data={data}
+          margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+        >
+          <defs>
+            <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.25} />
+              <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="var(--border)"
+            vertical={false}
+          />
+          <XAxis
+            dataKey="name"
+            tick={{
+              fontSize: 11,
+              fontWeight: 600,
+              fill: "var(--muted-foreground)",
+            }}
+            axisLine={false}
+            tickLine={false}
+            dy={10}
+          />
+          <YAxis
+            tickFormatter={(v) =>
+              `$${v >= 1000 ? (v / 1000).toFixed(0) + "k" : v}`
+            }
+            tick={{
+              fontSize: 11,
+              fontWeight: 600,
+              fill: "var(--muted-foreground)",
+            }}
+            axisLine={false}
+            tickLine={false}
+            dx={-10}
+          />
+          <Tooltip
+            content={<CustomTooltip />}
+            cursor={{
+              stroke: "var(--primary)",
+              strokeWidth: 1,
+              strokeDasharray: "4 4",
+            }}
+          />
+          <Area
+            type="monotone"
+            dataKey="revenue"
+            stroke="var(--primary)"
+            strokeWidth={3}
+            fill="url(#revenueGrad)"
+            dot={{
+              r: 4,
+              fill: "var(--background)",
+              stroke: "var(--primary)",
+              strokeWidth: 2,
+            }}
+            activeDot={{
+              r: 6,
+              fill: "var(--primary)",
+              stroke: "var(--background)",
+              strokeWidth: 2,
+            }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 

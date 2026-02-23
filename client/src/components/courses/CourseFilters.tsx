@@ -42,10 +42,12 @@ export const CourseFilters = ({
             {levels.map((l) => (
               <label
                 key={l}
+                htmlFor={`level-${l}`}
                 className="flex items-center gap-2.5 cursor-pointer group"
               >
                 <input
                   type="radio"
+                  id={`level-${l}`}
                   name="level"
                   value={l}
                   checked={selectedLevel === l}
@@ -66,7 +68,11 @@ export const CourseFilters = ({
             Max Price:{" "}
             <span className="text-foreground font-bold">${priceMax}</span>
           </h4>
+          <label htmlFor="price-range" className="sr-only">
+            Maximum Price
+          </label>
           <input
+            id="price-range"
             type="range"
             min={0}
             max={1000}
@@ -75,7 +81,10 @@ export const CourseFilters = ({
             onChange={(e) => setPriceMax(Number(e.target.value))}
             className="w-full accent-primary"
           />
-          <div className="flex justify-between text-xs text-muted-foreground mt-1">
+          <div
+            className="flex justify-between text-xs text-muted-foreground mt-1"
+            aria-hidden="true"
+          >
             <span>$0</span>
             <span>$1000+</span>
           </div>
@@ -90,10 +99,12 @@ export const CourseFilters = ({
             {[4.5, 4.0, 3.5].map((r) => (
               <label
                 key={r}
+                htmlFor={`rating-${r}`}
                 className="flex items-center gap-2.5 cursor-pointer group"
               >
                 <input
                   type="checkbox"
+                  id={`rating-${r}`}
                   className="w-4 h-4 accent-primary rounded border-border text-primary focus:ring-primary/20 cursor-pointer"
                   checked={selectedRating === r}
                   onChange={() =>
@@ -101,8 +112,11 @@ export const CourseFilters = ({
                   }
                 />
                 <span className="text-sm text-foreground flex items-center gap-1 group-hover:text-primary transition-colors font-medium">
-                  <Star className="w-3.5 h-3.5 text-warning fill-warning" /> {r}{" "}
-                  & up
+                  <Star
+                    className="w-3.5 h-3.5 text-warning fill-warning"
+                    aria-hidden="true"
+                  />{" "}
+                  {r} & up
                 </span>
               </label>
             ))}

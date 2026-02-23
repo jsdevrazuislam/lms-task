@@ -13,11 +13,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isInitialized, logout } = useAuth();
   const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
@@ -75,7 +76,12 @@ export const Navbar = () => {
             )}
           </button>
 
-          {!isAuthenticated ? (
+          {!isInitialized ? (
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-16 rounded-lg" />
+              <Skeleton className="h-10 w-24 rounded-lg" />
+            </div>
+          ) : !isAuthenticated ? (
             <>
               <Link
                 href="/login"

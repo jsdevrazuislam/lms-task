@@ -18,9 +18,8 @@ export const useAuth = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { user, isAuthenticated, isLoading, error } = useAppSelector(
-    (state) => state.auth,
-  );
+  const { user, isAuthenticated, isLoading, isInitialized, error } =
+    useAppSelector((state) => state.auth);
 
   const handleRedirect = (role: string) => {
     const params = new URLSearchParams(window.location.search);
@@ -33,19 +32,19 @@ export const useAuth = () => {
 
     switch (role) {
       case "SUPER_ADMIN":
-        router.push("/dashboard/super-admin");
+        window.location.href = "/dashboard/super-admin";
         break;
       case "ADMIN":
-        router.push("/dashboard/admin");
+        window.location.href = "/dashboard/admin";
         break;
       case "INSTRUCTOR":
-        router.push("/dashboard/instructor");
+        window.location.href = "/dashboard/instructor";
         break;
       case "STUDENT":
-        router.push("/dashboard/student");
+        window.location.href = "/dashboard/student";
         break;
       default:
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
     }
   };
 
@@ -103,9 +102,8 @@ export const useAuth = () => {
     } finally {
       dispatch(logoutAction());
       queryClient.clear();
-      // Use window.location.href to fully reload the page and clear any in-memory state
-      // This prevents browser "Back" navigation from showing authenticated content
-      window.location.href = "/login";
+      // Use window.location.href to landing page to ensure middleware picks up cleared cookie
+      window.location.href = "/";
     }
   };
 
@@ -120,6 +118,7 @@ export const useAuth = () => {
     user,
     isAuthenticated,
     isLoading,
+    isInitialized,
     error,
     login: loginMutation.mutate,
     isLoggingIn: loginMutation.isPending,

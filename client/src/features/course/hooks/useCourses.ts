@@ -1,12 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { courseService, CourseFilters } from "../services/course.service";
-import { ICourse } from "../types";
+import { ICourse, CoursesResponse } from "../types";
 
-export const useCourses = (params?: CourseFilters) => {
+export const useCourses = (
+  params?: CourseFilters,
+  options?: { initialData?: CoursesResponse },
+) => {
   return useQuery({
     queryKey: ["courses", params],
     queryFn: () => courseService.getCourses(params),
     staleTime: 1000 * 60 * 5, // 5 minutes cache
+    ...options,
   });
 };
 
