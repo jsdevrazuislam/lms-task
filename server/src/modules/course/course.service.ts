@@ -30,13 +30,30 @@ const createCourse = async (instructorId: string, payload: ICreateCourse) => {
 
   const result = await courseRepository.create(instructorId, payload);
 
-  // Notify Admins (Real-time alert)
-  const { emitToAdmins, SocketEvent } = await import('../../config/socket.js');
-  emitToAdmins(SocketEvent.NOTIFICATION, {
-    title: 'New Course Submission',
-    message: `A new course "${payload.title}" has been created and is awaiting review.`,
-    type: 'INFO',
+  // Notify Admins
+  const admins = await prisma.user.findMany({
+    where: {
+      role: {
+        in: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+      },
+      isActive: true,
+    },
+    select: { id: true },
   });
+
+  const { NotificationService } =
+    await import('../notification/notification.service.js');
+  const { NotificationType } =
+    await import('../notification/notification.interface.js');
+
+  for (const admin of admins) {
+    await NotificationService.createNotification({
+      userId: admin.id,
+      title: 'New Course Submission',
+      message: `A new course "${payload.title}" has been created and is awaiting review.`,
+      type: NotificationType.INFO,
+    });
+  }
 
   return result;
 };

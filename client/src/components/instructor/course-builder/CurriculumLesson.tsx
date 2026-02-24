@@ -13,7 +13,7 @@ import {
   ListTree,
   Video,
 } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormContext, useWatch, useFormState } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
@@ -44,7 +44,8 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
   lIdx,
   removeLesson,
 }) => {
-  const { register, control, setValue } = useFormContext<CourseFormValues>();
+  const { register, control, setValue, trigger } =
+    useFormContext<CourseFormValues>();
 
   const { errors } = useFormState({
     control,
@@ -81,6 +82,15 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
     control,
     name: `modules.${mIdx}.lessons.${lIdx}.content`,
   });
+
+  useEffect(() => {
+    // Explicitly trigger validation when content or videoUrl changes to ensure real-time error clearing
+    // This is especially important for custom Zod refinements that might not be re-checked automatically
+    if (content || videoUrl) {
+      trigger(`modules.${mIdx}.lessons.${lIdx}.content`);
+      trigger(`modules.${mIdx}.lessons.${lIdx}.videoUrl`);
+    }
+  }, [content, videoUrl, trigger, mIdx, lIdx]);
 
   return (
     <Draggable draggableId={lesson.id} index={lIdx}>

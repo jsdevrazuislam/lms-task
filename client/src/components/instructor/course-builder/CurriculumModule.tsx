@@ -112,16 +112,11 @@ export const CurriculumModule: React.FC<CurriculumModuleProps> = ({
           </div>
         )}
       </Draggable>
-      {errors.modules?.[mIdx] &&
-        (errors.modules[mIdx] as Record<string, { message?: string }>)?.lessons
-          ?.message && (
-          <p className="text-xs text-destructive mt-2 font-bold px-4">
-            {
-              (errors.modules[mIdx] as Record<string, { message?: string }>)
-                .lessons?.message
-            }
-          </p>
-        )}
+      {errors.modules?.[mIdx]?.lessons && (
+        <p className="text-xs text-destructive mt-2 font-bold px-4">
+          {errors.modules[mIdx]!.lessons.message}
+        </p>
+      )}
     </>
   );
 };

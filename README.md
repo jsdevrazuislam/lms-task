@@ -14,7 +14,7 @@ A professional, enterprise-grade Learning Management System designed for scale, 
 The project is built using a monorepo structure (pnpm workspaces) with a clear separation between the client and server.
 
 ### 💻 Client (Frontend)
-- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js 16+](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
 - **State Management**:
