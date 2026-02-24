@@ -23,7 +23,7 @@ export const CourseSettingsStep: React.FC<CourseSettingsStepProps> = ({
 }) => {
   const {
     register,
-    formState: { errors },
+    formState: { errors, touchedFields, isSubmitted },
   } = useFormContext<CourseFormValues>();
 
   return (
@@ -48,11 +48,12 @@ export const CourseSettingsStep: React.FC<CourseSettingsStepProps> = ({
               className="h-32"
               {...register("whatYouLearn")}
             />
-            {errors.whatYouLearn && (
-              <p className="text-xs text-destructive">
-                {errors.whatYouLearn.message}
-              </p>
-            )}
+            {errors.whatYouLearn &&
+              (touchedFields.whatYouLearn || isSubmitted) && (
+                <p className="text-xs text-destructive">
+                  {errors.whatYouLearn.message}
+                </p>
+              )}
           </div>
 
           <div className="space-y-2">
@@ -65,11 +66,12 @@ export const CourseSettingsStep: React.FC<CourseSettingsStepProps> = ({
               className="h-32"
               {...register("requirements")}
             />
-            {errors.requirements && (
-              <p className="text-xs text-destructive">
-                {errors.requirements.message}
-              </p>
-            )}
+            {errors.requirements &&
+              (touchedFields.requirements || isSubmitted) && (
+                <p className="text-xs text-destructive">
+                  {errors.requirements.message}
+                </p>
+              )}
           </div>
 
           <div className="space-y-2">
@@ -79,7 +81,7 @@ export const CourseSettingsStep: React.FC<CourseSettingsStepProps> = ({
               placeholder="e.g., react, tailwind, coding, beginner"
               {...register("tags")}
             />
-            {errors.tags && (
+            {errors.tags && (touchedFields.tags || isSubmitted) && (
               <p className="text-xs text-destructive">{errors.tags.message}</p>
             )}
             <p className="text-[10px] text-muted-foreground italic">
@@ -96,11 +98,12 @@ export const CourseSettingsStep: React.FC<CourseSettingsStepProps> = ({
                 className="h-24"
                 {...register("metaDescription")}
               />
-              {errors.metaDescription && (
-                <p className="text-xs text-destructive">
-                  {errors.metaDescription.message}
-                </p>
-              )}
+              {errors.metaDescription &&
+                (touchedFields.metaDescription || isSubmitted) && (
+                  <p className="text-xs text-destructive">
+                    {errors.metaDescription.message}
+                  </p>
+                )}
               <p className="text-[10px] text-muted-foreground">
                 Appears in Google search results and social links.
               </p>

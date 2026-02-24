@@ -96,7 +96,7 @@ export default function CourseFormClient({
 
   const methods = useForm<CourseFormValues>({
     resolver: zodResolver(courseSchema),
-    mode: "onBlur",
+    mode: "onChange",
     defaultValues: initialData || {
       title: "",
       subtitle: "",

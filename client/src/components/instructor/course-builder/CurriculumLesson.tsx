@@ -14,7 +14,7 @@ import {
   Video,
 } from "lucide-react";
 import React from "react";
-import { useFormContext, useWatch } from "react-hook-form";
+import { useFormContext, useWatch, useFormState } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -44,12 +44,12 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
   lIdx,
   removeLesson,
 }) => {
-  const {
-    register,
+  const { register, control, setValue } = useFormContext<CourseFormValues>();
+
+  const { errors } = useFormState({
     control,
-    setValue,
-    formState: { errors },
-  } = useFormContext<CourseFormValues>();
+  });
+
   const {
     expandedLessons,
     toggleLessonExpansion,
@@ -88,8 +88,18 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className="bg-card rounded-xl border group overflow-hidden transition-all duration-200"
+          className={`bg-card rounded-xl border group overflow-hidden transition-all duration-200 ${
+            errors.modules?.[mIdx]?.lessons?.[lIdx]
+              ? "border-destructive ring-1 ring-destructive/20 shadow-[0_0_15px_rgba(239,68,68,0.1)]"
+              : "hover:border-primary/30"
+          }`}
         >
+          {errors.modules?.[mIdx]?.lessons?.[lIdx] && (
+            <div className="bg-destructive text-white text-[10px] font-bold px-3 py-1 flex items-center gap-2">
+              <AlertCircle className="w-3 h-3" />
+              Lesson has validation errors
+            </div>
+          )}
           <div className="flex items-center gap-3 p-3">
             <div {...provided.dragHandleProps}>
               <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -104,10 +114,33 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
                   placeholder="Lesson Title"
                   {...register(`modules.${mIdx}.lessons.${lIdx}.title`)}
                 />
-                {errors.modules?.[mIdx]?.lessons?.[lIdx]?.title && (
-                  <p className="text-[10px] text-destructive font-bold">
-                    {errors.modules[mIdx]?.lessons?.[lIdx]?.title?.message}
-                  </p>
+                {errors.modules?.[mIdx]?.lessons?.[lIdx] && (
+                  <div className="flex flex-col gap-1 mt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                    {errors.modules?.[mIdx]?.lessons?.[lIdx]?.title && (
+                      <p className="text-[10px] text-destructive font-bold flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {errors.modules[mIdx]?.lessons?.[lIdx]?.title?.message}
+                      </p>
+                    )}
+                    {errors.modules?.[mIdx]?.lessons?.[lIdx]?.content && (
+                      <p className="text-[10px] text-destructive font-bold flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {
+                          errors.modules[mIdx]?.lessons?.[lIdx]?.content
+                            ?.message
+                        }
+                      </p>
+                    )}
+                    {errors.modules?.[mIdx]?.lessons?.[lIdx]?.videoUrl && (
+                      <p className="text-[10px] text-destructive font-bold flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {
+                          errors.modules[mIdx]?.lessons?.[lIdx]?.videoUrl
+                            ?.message
+                        }
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
               <div className="flex items-center gap-3 ml-auto">
@@ -198,7 +231,7 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
                     {...register(`modules.${mIdx}.lessons.${lIdx}.content`)}
                   />
                   {errors.modules?.[mIdx]?.lessons?.[lIdx]?.content && (
-                    <p className="text-[10px] text-destructive font-bold">
+                    <p className="text-xs text-destructive font-bold block mt-1">
                       {errors.modules[mIdx]?.lessons?.[lIdx]?.content?.message}
                     </p>
                   )}
@@ -218,7 +251,7 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
                         className="relative group cursor-pointer"
                         onClick={() =>
                           document
-                            .getElementById(`video - upload - ${lesson.id} `)
+                            .getElementById(`video-upload-${lesson.id}`)
                             ?.click()
                         }
                       >
@@ -245,7 +278,7 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
                           </div>
                         </div>
                         <input
-                          id={`video - upload - ${lesson.id} `}
+                          id={`video-upload-${lesson.id}`}
                           type="file"
                           accept="video/*"
                           className="hidden"
@@ -282,7 +315,7 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
                         <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                           <div
                             className="h-full bg-primary transition-all duration-500 ease-out shadow-[0_0_10px_rgba(var(--primary),0.5)]"
-                            style={{ width: `${uploadProgress}% ` }}
+                            style={{ width: `${uploadProgress}%` }}
                           />
                         </div>
                       </div>
@@ -312,9 +345,7 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
                               className="h-9 px-4 rounded-xl text-xs font-bold border-emerald-200 bg-white hover:bg-emerald-50 transition-colors"
                               onClick={() =>
                                 document
-                                  .getElementById(
-                                    `video - upload - ${lesson.id} `,
-                                  )
+                                  .getElementById(`video-upload-${lesson.id}`)
                                   ?.click()
                               }
                             >
@@ -341,8 +372,8 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
                     )}
 
                     {errors.modules?.[mIdx]?.lessons?.[lIdx]?.videoUrl && (
-                      <p className="text-xs text-destructive font-bold flex items-center gap-1.5 mt-2">
-                        <AlertCircle className="w-3.5 h-3.5" />
+                      <p className="text-sm text-destructive font-bold flex items-center gap-2 mt-2 p-2 bg-destructive/5 rounded-lg border border-destructive/20">
+                        <AlertCircle className="w-4 h-4" />
                         {
                           errors.modules[mIdx]?.lessons?.[lIdx]?.videoUrl
                             ?.message

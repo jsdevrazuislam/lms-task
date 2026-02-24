@@ -55,14 +55,14 @@ export const courseSchema = z.object({
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: "Text content must be at least 10 characters",
-              path: ["modules", mIdx, "lessons", lIdx, "content"],
+              path: [mIdx, "lessons", lIdx, "content"],
             });
           }
           if (lesson.contentType === "video" && !lesson.videoUrl) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: "Video upload is required for this lesson",
-              path: ["modules", mIdx, "lessons", lIdx, "videoUrl"],
+              path: [mIdx, "lessons", lIdx, "videoUrl"],
             });
           }
         });
