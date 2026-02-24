@@ -71,6 +71,7 @@ model Course {
   rating          Float        @default(0)
   requirements    String[]     @default([])
   whatYouLearn    String[]     @default([])
+  promoVideoUrl   String?
   category        Category     @relation(fields: [categoryId], references: [id])
   instructor      User         @relation("InstructorCourses", fields: [instructorId], references: [id])
   enrollments     Enrollment[]

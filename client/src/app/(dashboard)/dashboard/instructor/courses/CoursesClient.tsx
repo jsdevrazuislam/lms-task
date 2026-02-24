@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "@bprogress/next";
 import {
   Search,
   Plus,
@@ -16,7 +17,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { DataTable } from "@/components/shared/DataTable";

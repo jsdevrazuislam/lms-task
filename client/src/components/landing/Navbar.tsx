@@ -142,7 +142,7 @@ export const Navbar = () => {
                 <DropdownMenuSeparator className="my-2 bg-border h-px -mx-2" />
                 <DropdownMenuItem
                   onClick={() => logout()}
-                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl cursor-pointer transition-colors"
                 >
                   <span className="text-sm font-bold">Sign Out</span>
                 </DropdownMenuItem>

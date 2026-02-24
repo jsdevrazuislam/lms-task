@@ -1,10 +1,10 @@
 "use client";
 
+import { useRouter } from "@bprogress/next";
 import { DropResult } from "@hello-pangea/dnd";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Layout, ListTree, Video, Settings2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   useForm,

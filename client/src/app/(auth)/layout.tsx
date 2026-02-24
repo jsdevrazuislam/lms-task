@@ -1,5 +1,7 @@
 "use client";
-import { useRouter } from "next/navigation";
+
+import { useRouter } from "@bprogress/next";
+import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import { useAppSelector } from "@/store";
 
@@ -36,7 +38,16 @@ export default function AuthLayout({
   }, [isAuthenticated, isInitialized, user, router]);
 
   if (!isInitialized || isAuthenticated) {
-    return null; // Don't show auth forms while checking or if already auth'd
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4 animate-in fade-in duration-500">
+          <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          <p className="text-sm font-medium text-muted-foreground animate-pulse">
+            Securely redirecting to your dashboard...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return <div className="min-h-screen bg-background">{children}</div>;

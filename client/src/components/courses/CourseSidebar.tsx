@@ -14,10 +14,11 @@ import {
 import Image from "next/image";
 import { useState } from "react";
 
+import { CustomImage } from "@/components/ui/CustomImage";
 import { ICourse } from "@/features/course/types";
 import { useEnrollment } from "@/features/enrollment/hooks/useEnrollment";
 import { useEnrollmentStatus } from "@/features/enrollment/hooks/useEnrollmentStatus";
-import { PreviewModal } from "./PreviewModal";
+import { PromoPreviewModal } from "./PromoPreviewModal";
 
 interface CourseSidebarProps {
   course: ICourse;
@@ -45,13 +46,21 @@ export const CourseSidebar = ({ course, totalLessons }: CourseSidebarProps) => {
           {/* Video preview thumb */}
           <div
             onClick={() => setIsPreviewOpen(true)}
-            className={`h-48 bg-linear-to-br ${course.gradient || "from-primary/20 to-primary/40"} relative flex items-center justify-center cursor-pointer group`}
+            className="h-48 relative flex items-center justify-center cursor-pointer group overflow-hidden"
           >
-            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition-colors">
+            <CustomImage
+              src={course.thumbnail || "/placeholder-course.png"}
+              alt={course.title}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+
+            <div className=" absolute z-10 w-16 h-16 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition-colors">
               <Play className="w-7 h-7 text-white group-hover:scale-110 transition-transform" />
             </div>
-            <div className="absolute bottom-3 left-3 right-3 text-center">
-              <span className="text-white/80 text-xs font-medium">
+            <div className="absolute bottom-3 left-3 right-3 text-center z-10">
+              <span className="text-white/90 text-xs font-medium drop-shadow-md">
                 Preview this course
               </span>
             </div>
@@ -61,11 +70,11 @@ export const CourseSidebar = ({ course, totalLessons }: CourseSidebarProps) => {
             {/* Price */}
             <div className="flex items-center gap-3 mb-1">
               <span className="text-3xl font-extrabold text-foreground">
-                ${course.price}
+                ${course?.price?.toFixed(2)}
               </span>
               {course.originalPrice && (
                 <span className="text-lg text-muted-foreground line-through">
-                  ${course.originalPrice}
+                  ${course?.originalPrice?.toFixed(2)}
                 </span>
               )}
               {discount > 0 && (
@@ -183,11 +192,12 @@ export const CourseSidebar = ({ course, totalLessons }: CourseSidebarProps) => {
           </div>
         )}
       </div>
-      <PreviewModal
+      <PromoPreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         title={course.title}
         videoUrl={course.promoVideoUrl}
+        poster={course.thumbnail || "/placeholder-course.png"}
       />
     </div>
   );

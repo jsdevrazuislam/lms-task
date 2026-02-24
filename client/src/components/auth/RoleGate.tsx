@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@bprogress/next";
 import { ReactNode, useEffect } from "react";
 import { UserRole } from "@/features/auth/types";
 import { useAppSelector } from "@/store";

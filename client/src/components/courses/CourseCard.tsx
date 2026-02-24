@@ -81,11 +81,11 @@ export const CourseCard = ({
 
         <div className="flex items-center gap-2 mb-4">
           <span className="text-base font-bold text-foreground">
-            {course.price === 0 ? "Free" : `$${course.price}`}
+            {course.price === 0 ? "Free" : `$${course.price?.toFixed(2)}`}
           </span>
           {course.originalPrice && course.originalPrice > course.price && (
             <span className="text-xs text-muted-foreground line-through decoration-muted-foreground/50">
-              ${course.originalPrice}
+              ${course?.originalPrice?.toFixed(2)}
             </span>
           )}
         </div>

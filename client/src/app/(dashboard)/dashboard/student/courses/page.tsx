@@ -76,7 +76,7 @@ const CourseCard = ({ enrollment }: { enrollment: IEnrollment }) => {
     <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 group flex flex-col">
       <div className="relative h-44 overflow-hidden shrink-0">
         <Image
-          src={enrollment.course.thumbnail || "/placeholder-course.jpg"}
+          src={enrollment.course.thumbnail || "/placeholder-course.png"}
           alt={enrollment.course.title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-500"

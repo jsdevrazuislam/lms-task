@@ -24,9 +24,7 @@ export const courseSchema = z.object({
     .string()
     .min(10, "Please provide at least 10 characters of requirements"),
   tags: z.string().optional(),
-  metaDescription: z
-    .string()
-    .min(10, "Meta description should be at least 10 characters"),
+  metaDescription: z.string().optional(),
   modules: z
     .array(
       z.object({

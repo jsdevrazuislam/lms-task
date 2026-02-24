@@ -83,6 +83,14 @@ const getCourseById = async (
     throw new ApiError(httpStatus.NOT_FOUND, 'Course not found');
   }
 
+  const isOwner = user ? course.instructorId === user.id : false;
+  const isAdmin =
+    user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
+
+  const isEnrolled = user
+    ? await courseRepository.isEnrolled(user.id, id)
+    : false;
+
   // Security check for DRAFT/ARCHIVED courses
   if (course.status !== CourseStatus.PUBLISHED) {
     if (!user) {
@@ -91,9 +99,6 @@ const getCourseById = async (
         'You do not have permission to view this course'
       );
     }
-    const isOwner = course.instructorId === user.id;
-    const isAdmin =
-      user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN;
 
     if (!isOwner && !isAdmin) {
       throw new ApiError(
@@ -103,7 +108,10 @@ const getCourseById = async (
     }
   }
 
-  // Transform modules to curriculum format for frontend
+  // Strict backend filtering: Only expose videoUrl to authorized users
+  const canAccessVideos = isOwner || isAdmin || isEnrolled;
+
+  // 1. Transform modules to curriculum format for frontend
   const curriculum = course.modules
     ?.map((module) => ({
       id: module.id,
@@ -119,11 +127,21 @@ const getCourseById = async (
             order: lesson.order,
             duration: lesson.duration || '0m',
             free: lesson.isFree || false,
+            videoUrl: lesson.isFree || canAccessVideos ? lesson.videoUrl : null,
             contentType: lesson.contentType || 'video',
           }))
           .sort((a, b) => a.order - b.order) || [],
     }))
     .sort((a, b) => a.order - b.order);
+
+  // 2. Filter the raw modules array as well (security deep-defense)
+  const filteredModules = course.modules?.map((module) => ({
+    ...module,
+    lessons: module.lessons?.map((lesson) => ({
+      ...lesson,
+      videoUrl: lesson.isFree || canAccessVideos ? lesson.videoUrl : null,
+    })),
+  }));
 
   const totalLessons =
     course.modules?.reduce(
@@ -133,6 +151,7 @@ const getCourseById = async (
 
   return {
     ...course,
+    modules: filteredModules,
     totalLessons,
     students: course._count?.enrollments || 0,
     curriculum,
@@ -227,6 +246,10 @@ const getPopularCourses = async () => {
   return courseRepository.findPopular();
 };
 
+const getRecommendedCourses = async (studentId: string) => {
+  return courseRepository.findRecommended(studentId);
+};
+
 const getVideoTicket = async (
   courseId: string,
   lessonId: string,
@@ -265,23 +288,19 @@ const getVideoTicket = async (
 
   try {
     const rawUrl = requestedLesson.videoUrl;
-    // Improved regex to handle various cloudinary URL formats and extract publicId
     const parts = rawUrl.split('/upload/');
     if (parts.length < 2) throw new Error('Invalid video URL');
 
-    // Remove version and extension: v12345/folder/publicId.mp4 -> folder/publicId
     const pathAfterUpload = parts[parts.length - 1]!;
     const pathWithoutVersion = pathAfterUpload.replace(/^v\d+\//, '');
     const publicId = pathWithoutVersion.replace(/\.[^/.]+$/, '');
 
-    // Generate signed HLS URL
-    // Note: Removed aes-128 as it requires specific account-level setup and KEK configuration
     const signedUrl = cloudinary.url(publicId, {
       resource_type: 'video',
       format: 'm3u8',
       sign_url: true,
-      streaming_profile: 'hd', // Use a standard profile
-      expires_at: Math.floor(Date.now() / 1000) + 7200, // 2 hours
+      streaming_profile: 'hd',
+      expires_at: Math.floor(Date.now() / 1000) + 7200,
     });
 
     return {
@@ -297,18 +316,11 @@ const getVideoTicket = async (
   }
 };
 
-/**
- * Returns the decryption key for HLS.
- * Cloudinary typically serves the key via a URL, but for maximum security
- * we could proxy it or use custom key delivery.
- * For this simplified production implementation, we check auth and return "access granted" context.
- */
 const getVideoKey = async (
   courseId: string,
   lessonId: string,
   user: { id: string; role: UserRole }
 ) => {
-  // Verification is identical to ticket generation
   const isEnrolled = await courseRepository.isEnrolled(user.id, courseId);
   const course = await courseRepository.findById(courseId);
   const isOwner = course?.instructorId === user.id;
@@ -316,7 +328,6 @@ const getVideoKey = async (
     user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN;
 
   if (!isEnrolled && !isOwner && !isAdmin) {
-    // Check if lesson is free
     let requestedLesson: Lesson | null = null;
     if (course) {
       for (const module of course.modules || []) {
@@ -332,14 +343,7 @@ const getVideoKey = async (
     }
   }
 
-  // In a full DRM/AES setup, we'd return the binary key here.
-  // With Cloudinary's default AES, they provide the key URL.
-  // To protect the key, we ensure this endpoint is only accessible to auth users.
   return { status: 'authorized' };
-};
-
-const getRecommendedCourses = async (studentId: string) => {
-  return courseRepository.findRecommended(studentId);
 };
 
 export const courseService = {

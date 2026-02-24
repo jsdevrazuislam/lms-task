@@ -3,7 +3,7 @@
 import { PlayCircle, ChevronDown, ChevronUp, Play, Lock } from "lucide-react";
 import { useState } from "react";
 import { ICurriculumSection, ICurriculumItem } from "@/features/course/types";
-import { PreviewModal } from "./PreviewModal";
+import { PromoPreviewModal } from "./PromoPreviewModal";
 
 interface CourseCurriculumProps {
   curriculum: ICurriculumSection[];
@@ -56,7 +56,6 @@ export const CourseCurriculum = ({
                 )}
               </div>
             </button>
-
             {openSection === idx && (
               <div className="divide-y divide-border animate-fade-in">
                 {section.items.map((item, i) => (
@@ -64,22 +63,22 @@ export const CourseCurriculum = ({
                     key={i}
                     className="flex items-center justify-between px-4 py-3 hover:bg-muted/20 transition-colors"
                   >
-                    <div className="flex items-center gap-3">
-                      {item.isFree ? (
+                    <div className="flex items-center capitalize gap-3">
+                      {item.free ? (
                         <Play className="w-4 h-4 text-primary shrink-0" />
                       ) : (
                         <Lock className="w-4 h-4 text-muted-foreground shrink-0" />
                       )}
                       <span
                         className={`text-sm ${
-                          item.isFree
+                          item.free
                             ? "text-primary font-medium"
                             : "text-foreground"
                         }`}
                       >
                         {item.title}
                       </span>
-                      {item.isFree && (
+                      {item.free && (
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -102,7 +101,7 @@ export const CourseCurriculum = ({
         ))}
       </div>
 
-      <PreviewModal
+      <PromoPreviewModal
         isOpen={!!previewItem}
         onClose={() => setPreviewItem(null)}
         title={previewItem?.title || ""}

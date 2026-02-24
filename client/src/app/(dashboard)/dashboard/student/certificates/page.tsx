@@ -10,9 +10,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useCertificates } from "@/features/enrollment/hooks/useCertificates";
 
-function simulatePdfDownload(courseTitle: string, date: string) {
+function simulatePdfDownload(courseTitle: string, date: string, name: string) {
   const content = `
 LearnFlow Learning Platform
 ============================
@@ -21,7 +22,7 @@ CERTIFICATE OF COMPLETION
 
 This is to certify that
 
-Alex Johnson
+${name}
 
 has successfully completed the course:
 
@@ -47,6 +48,7 @@ export default function StudentCertificates() {
   const { data: certsData, isLoading } = useCertificates();
   const certificates = certsData?.data || [];
   const [downloading, setDownloading] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const handleDownload = (
     courseId: string,
@@ -55,7 +57,11 @@ export default function StudentCertificates() {
   ) => {
     setDownloading(courseId);
     setTimeout(() => {
-      simulatePdfDownload(courseTitle, date);
+      simulatePdfDownload(
+        courseTitle,
+        date,
+        `${user?.firstName} ${user?.lastName}`,
+      );
       setDownloading(null);
     }, 800);
   };

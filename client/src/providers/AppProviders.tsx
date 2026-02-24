@@ -42,8 +42,8 @@ export default function AppProviders({
           <AuthInitializer>
             <SocketInitializer>
               <ProgressProvider
-                height="3px"
-                color="#0ea5e9"
+                height="5px"
+                color="#4338ca"
                 options={{ showSpinner: false }}
                 shallowRouting
               >

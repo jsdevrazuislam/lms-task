@@ -26,6 +26,7 @@ export interface ICurriculumItem {
   title: string;
   duration: string;
   isFree: boolean;
+  free: boolean;
   videoUrl?: string;
   contentType?: "video" | "text" | "quiz";
   order: number;

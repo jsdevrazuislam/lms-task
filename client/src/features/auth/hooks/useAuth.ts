@@ -1,5 +1,5 @@
+import { useRouter } from "@bprogress/next";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   authService,

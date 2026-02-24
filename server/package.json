@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "seed": "tsx prisma/seed.ts",
+    "db:clear": "tsx prisma/clear-db.ts",
     "build": "tsc",
     "start": "node dist/src/server.js",
     "lint": "eslint \"src/**/*.ts\"",

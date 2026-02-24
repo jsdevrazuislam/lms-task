@@ -128,7 +128,8 @@ export default function CoursesCatalogClient({
       page === 1 &&
       !search &&
       selectedCategoryId === "All" &&
-      selectedLevel === "All Levels"
+      selectedLevel === "All Levels" &&
+      selectedSort === "Most Popular"
         ? initialCourses
         : undefined,
   });

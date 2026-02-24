@@ -25,7 +25,7 @@ export const notificationService = {
    * Mark all notifications as read for the current user
    */
   async markAllAsRead(): Promise<void> {
-    await apiClient.patch("/notifications/read-all");
+    await apiClient.patch("/notifications/mark-all-read");
   },
 
   /**

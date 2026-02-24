@@ -177,7 +177,7 @@ export default function StudentDashboard() {
             <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 group">
               <div className="relative h-44 overflow-hidden">
                 <Image
-                  src={continueLearning.thumbnail || "/placeholder-course.jpg"}
+                  src={continueLearning.thumbnail || "/placeholder-course.png"}
                   alt={continueLearning.courseTitle}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -242,7 +242,7 @@ export default function StudentDashboard() {
                   >
                     <div className="relative w-14 h-10 overflow-hidden rounded-lg shrink-0">
                       <Image
-                        src={e.course.thumbnail || "/placeholder-course.jpg"}
+                        src={e.course.thumbnail || "/placeholder-course.png"}
                         alt={e.course.title}
                         fill
                         className="object-cover"
@@ -369,7 +369,7 @@ export default function StudentDashboard() {
                 className="block relative h-28 overflow-hidden"
               >
                 <Image
-                  src={c.thumbnail || "/placeholder-course.jpg"}
+                  src={c.thumbnail || "/placeholder-course.png"}
                   alt={c.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"

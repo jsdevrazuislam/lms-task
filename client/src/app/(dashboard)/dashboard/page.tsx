@@ -1,6 +1,6 @@
 "use client";
+import { useRouter } from "@bprogress/next";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { UserRole } from "@/features/auth/types";
 import { useAppSelector } from "@/store";

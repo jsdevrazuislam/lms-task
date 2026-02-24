@@ -1,7 +1,7 @@
 "use client";
 
+import { useRouter } from "@bprogress/next";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { enrollmentApi } from "@/features/enrollment/enrollment.api";
 import { useAppSelector } from "@/store";

@@ -163,7 +163,7 @@ export default function StudentProgress() {
                         <div className="flex items-center gap-3">
                           <div className="relative w-10 h-7 overflow-hidden rounded-lg shrink-0">
                             <Image
-                              src={e.thumbnail || "/placeholder-course.jpg"}
+                              src={e.thumbnail || "/placeholder-course.png"}
                               alt=""
                               fill
                               className="object-cover"
@@ -212,7 +212,7 @@ export default function StudentProgress() {
               <div className="relative h-32">
                 <Image
                   src={
-                    selectedEnrollment.thumbnail || "/placeholder-course.jpg"
+                    selectedEnrollment.thumbnail || "/placeholder-course.png"
                   }
                   alt={selectedEnrollment.courseTitle}
                   fill

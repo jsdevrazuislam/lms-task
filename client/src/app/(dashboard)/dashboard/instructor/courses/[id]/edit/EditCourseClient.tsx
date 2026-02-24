@@ -1,8 +1,9 @@
 "use client";
 
+import { useRouter } from "@bprogress/next";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
 import CourseFormClient from "@/components/instructor/course-builder/CourseFormClient";
