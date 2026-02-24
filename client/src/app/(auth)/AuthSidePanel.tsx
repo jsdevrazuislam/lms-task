@@ -1,5 +1,6 @@
 import { BookOpen } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 interface AuthSidePanelProps {
   title: string | React.ReactNode;
@@ -30,12 +31,15 @@ export function AuthSidePanel({
         className="absolute inset-0 w-full h-full object-cover opacity-40"
       />
       <div className="relative z-10">
-        <div className="flex items-center gap-3 mb-16">
+        <Link
+          href="/"
+          className="flex items-center gap-3 mb-16 cursor-pointer hover:opacity-80 transition-opacity w-fit"
+        >
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-primary">
             <BookOpen className="w-5 h-5 text-white" />
           </div>
           <span className="text-xl font-bold tracking-tight">LearnFlow</span>
-        </div>
+        </Link>
 
         <div className="max-w-md animate-fade-in">
           {icon && (

@@ -197,6 +197,11 @@ export const CurriculumLesson: React.FC<CurriculumLessonProps> = ({
                     placeholder="Write your lesson content here..."
                     {...register(`modules.${mIdx}.lessons.${lIdx}.content`)}
                   />
+                  {errors.modules?.[mIdx]?.lessons?.[lIdx]?.content && (
+                    <p className="text-[10px] text-destructive font-bold">
+                      {errors.modules[mIdx]?.lessons?.[lIdx]?.content?.message}
+                    </p>
+                  )}
                   <p className="text-[10px] text-muted-foreground text-right italic">
                     {content?.length || 0} characters
                   </p>

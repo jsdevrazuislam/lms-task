@@ -26,6 +26,11 @@ const createCourseValidationSchema = z.object({
     requirements: z.array(z.string()).optional(),
     level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).optional(),
     isFree: z.boolean().optional(),
+    promoVideoUrl: z
+      .string()
+      .url('Invalid video URL')
+      .optional()
+      .or(z.literal('')),
     rating: z.number().min(0).max(5).optional(),
     metaDescription: z.string().optional(),
     status: z.nativeEnum(CourseStatus).optional(),
@@ -86,6 +91,11 @@ const updateCourseValidationSchema = z.object({
     requirements: z.array(z.string()).optional(),
     level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).optional(),
     isFree: z.boolean().optional(),
+    promoVideoUrl: z
+      .string()
+      .url('Invalid video URL')
+      .optional()
+      .or(z.literal('')),
     rating: z.number().min(0).max(5).optional(),
     metaDescription: z.string().optional(),
     status: z.nativeEnum(CourseStatus).optional(),

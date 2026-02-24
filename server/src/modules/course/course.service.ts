@@ -22,6 +22,12 @@ const createCourse = async (instructorId: string, payload: ICreateCourse) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Category does not exist');
   }
 
+  // Force price to 0 if course is free
+  if (payload.isFree) {
+    payload.price = 0;
+    payload.originalPrice = 0;
+  }
+
   const result = await courseRepository.create(instructorId, payload);
 
   // Notify Admins (Real-time alert)
@@ -192,6 +198,12 @@ const updateCourse = async (
     if (!category) {
       throw new ApiError(httpStatus.BAD_REQUEST, 'Category does not exist');
     }
+  }
+
+  // Force price to 0 if course is free
+  if (payload.isFree) {
+    payload.price = 0;
+    payload.originalPrice = 0;
   }
 
   const result = await courseRepository.update(id, payload);

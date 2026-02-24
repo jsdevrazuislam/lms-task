@@ -42,6 +42,7 @@ export interface ICreateCourse {
   level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   rating?: number;
   isFree?: boolean;
+  promoVideoUrl?: string;
   metaDescription?: string;
   status?: CourseStatus;
   modules?: IModule[];

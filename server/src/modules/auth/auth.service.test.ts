@@ -71,6 +71,7 @@ describe('AuthService', () => {
       password: 'password123',
       firstName: 'John',
       lastName: 'Doe',
+      role: 'STUDENT' as const,
     };
 
     it('should register a new user successfully', async () => {

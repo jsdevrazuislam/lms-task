@@ -1,4 +1,4 @@
-import type { User } from '@prisma/client';
+import type { User, UserRole } from '@prisma/client';
 import type { JwtPayload } from 'jsonwebtoken';
 
 import type { TUserRole } from '../../common/constants/roles.js';
@@ -8,13 +8,14 @@ import type { TUserRole } from '../../common/constants/roles.js';
  */
 export type IRegisterUser = Pick<
   User,
-  'email' | 'password' | 'firstName' | 'lastName'
+  'email' | 'password' | 'firstName' | 'lastName' | 'role'
 >;
 
 /**
  * Internal interface for creating a user with security tokens
  */
 export interface ICreateUser extends IRegisterUser {
+  role: UserRole;
   verificationToken?: string | null;
   verificationTokenExpires?: Date | null;
 }

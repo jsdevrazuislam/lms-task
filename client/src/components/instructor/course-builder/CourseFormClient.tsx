@@ -80,6 +80,7 @@ export default function CourseFormClient({
           : "Your course has been successfully submitted. Our team will review it and publish it after approval.",
       );
       queryClient.invalidateQueries({ queryKey: ["instructor", "courses"] });
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
       queryClient.invalidateQueries({ queryKey: ["courses", courseId] });
       router.push("/dashboard/instructor/courses");
     },
@@ -173,6 +174,7 @@ export default function CourseFormClient({
               .filter(Boolean)
           : data.requirements,
       metaDescription: data.metaDescription,
+      promoVideoUrl: data.promoVideoUrl,
       modules: data.modules.map((m, mIdx) => ({
         id: m.id,
         title: m.title,

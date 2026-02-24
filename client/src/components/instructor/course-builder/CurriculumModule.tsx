@@ -44,72 +44,84 @@ export const CurriculumModule: React.FC<CurriculumModuleProps> = ({
   };
 
   return (
-    <Draggable draggableId={module.id} index={mIdx}>
-      {(provided) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          className="border rounded-xl bg-muted/20 overflow-hidden"
-        >
-          <div className="bg-muted/40 p-4 flex items-center gap-3 border-b">
-            <div {...provided.dragHandleProps}>
-              <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab" />
-            </div>
-            <div className="flex-1">
-              <Input
-                className="font-semibold text-base h-8 px-0 border-none focus-visible:ring-0 bg-transparent shadow-none"
-                placeholder="Section Title"
-                {...register(`modules.${mIdx}.title`)}
-              />
-              {errors.modules?.[mIdx]?.title && (
-                <p className="text-[10px] text-destructive font-bold">
-                  {errors.modules[mIdx]?.title?.message}
-                </p>
-              )}
-            </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="text-destructive"
-              onClick={() => removeModule(mIdx)}
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <Droppable droppableId={`module-${module.id}`} type="lesson">
-            {(provided) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className="p-4 space-y-3"
-              >
-                {lessonFields.map((lesson, lIdx) => (
-                  <CurriculumLesson
-                    key={lesson.id}
-                    lesson={lesson}
-                    mIdx={mIdx}
-                    lIdx={lIdx}
-                    removeLesson={removeLesson}
-                  />
-                ))}
-                {provided.placeholder}
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full border-2 border-dashed border-muted-foreground/10 h-10 text-xs text-muted-foreground hover:bg-muted/50"
-                  onClick={addLesson}
-                >
-                  <Plus className="w-3.5 h-3.5 mr-2" />
-                  Add Lesson
-                </Button>
+    <>
+      <Draggable draggableId={module.id} index={mIdx}>
+        {(provided) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            className="border rounded-xl bg-muted/20 overflow-hidden"
+          >
+            <div className="bg-muted/40 p-4 flex items-center gap-3 border-b">
+              <div {...provided.dragHandleProps}>
+                <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab" />
               </div>
-            )}
-          </Droppable>
-        </div>
-      )}
-    </Draggable>
+              <div className="flex-1">
+                <Input
+                  className="font-semibold text-base h-8 px-0 border-none focus-visible:ring-0 bg-transparent shadow-none"
+                  placeholder="Section Title"
+                  {...register(`modules.${mIdx}.title`)}
+                />
+                {errors.modules?.[mIdx]?.title && (
+                  <p className="text-[10px] text-destructive font-bold">
+                    {errors.modules[mIdx]?.title?.message}
+                  </p>
+                )}
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="text-destructive"
+                onClick={() => removeModule(mIdx)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <Droppable droppableId={`module-${module.id}`} type="lesson">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="p-4 space-y-3"
+                >
+                  {lessonFields.map((lesson, lIdx) => (
+                    <CurriculumLesson
+                      key={lesson.id}
+                      lesson={lesson}
+                      mIdx={mIdx}
+                      lIdx={lIdx}
+                      removeLesson={removeLesson}
+                    />
+                  ))}
+                  {provided.placeholder}
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="w-full border-2 border-dashed border-muted-foreground/10 h-10 text-xs text-muted-foreground hover:bg-muted/50"
+                    onClick={addLesson}
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-2" />
+                    Add Lesson
+                  </Button>
+                </div>
+              )}
+            </Droppable>
+          </div>
+        )}
+      </Draggable>
+      {errors.modules?.[mIdx] &&
+        (errors.modules[mIdx] as Record<string, { message?: string }>)?.lessons
+          ?.message && (
+          <p className="text-xs text-destructive mt-2 font-bold px-4">
+            {
+              (errors.modules[mIdx] as Record<string, { message?: string }>)
+                .lessons?.message
+            }
+          </p>
+        )}
+    </>
   );
 };

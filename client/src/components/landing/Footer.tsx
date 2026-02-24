@@ -51,8 +51,10 @@ export const Footer = () => {
           ))}
         </div>
         <div className="border-t border-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <span>© 2026 LearnFlow Inc. All rights reserved.</span>
-          <span>Made with ❤️ for lifelong learners</span>
+          <span>
+            © {new Date().getFullYear()} LearnFlow Inc. All rights reserved.
+          </span>
+          <span>Made with ❤️ by Md. Razu Islam</span>
         </div>
       </div>
     </footer>

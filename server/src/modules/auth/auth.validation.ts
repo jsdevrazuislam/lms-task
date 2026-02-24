@@ -11,6 +11,9 @@ export const registerValidationSchema = z.object({
       .min(6, { message: 'Password must be at least 6 characters long' }),
     firstName: z.string().min(1, { message: 'First name is required' }),
     lastName: z.string().min(1, { message: 'Last name is required' }),
+    role: z.enum(['STUDENT', 'INSTRUCTOR'], {
+      message: 'Role must be either STUDENT or INSTRUCTOR',
+    }),
   }),
 });
 

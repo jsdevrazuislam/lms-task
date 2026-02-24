@@ -121,9 +121,10 @@ We maintain high code quality through:
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
-| **Super Admin** | `superadmin@lms.com` | `password123` |
-| **Instructor** | `instructor@lms.com` | `password123` |
-| **Student** | `student@lms.com` | `password123` |
+| **Super Admin** | `superadmin@learnflow.com` | `password123` |
+| **Admin** | `admin@learnflow.com` | `password123` |
+| **Instructor** | `instructor1@learnflow.com` | `password123` |
+| **Student** | `roy.nikolaus@gmail.com` | `password123` |
 
 ---
 *Developed with focus on performance, security, and developer experience.*

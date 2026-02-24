@@ -5,11 +5,7 @@ export const registerSchema = z.object({
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum([
-    "Student / Learner",
-    "Instructor / Educator",
-    "Admin / Manager",
-  ]),
+  role: z.enum(["Student / Learner", "Instructor / Educator"]),
   terms: z.boolean().refine((val) => val === true, {
     message: "You must accept the terms and conditions",
   }),
