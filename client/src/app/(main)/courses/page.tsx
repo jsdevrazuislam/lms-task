@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { courseService } from "@/features/course/services/course.service";
 import CoursesCatalogClient from "./CoursesCatalogClient";
 
