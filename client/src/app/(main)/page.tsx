@@ -2,22 +2,22 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import { CourseSection } from "@/components/landing/CourseSection";
 import { Hero } from "@/components/landing/Hero";
 import { Stats } from "@/components/landing/Stats";
 
 // Below-the-fold components are loaded dynamically
-const Features = dynamic(() =>
+const Features = nextDynamic(() =>
   import("@/components/landing/Features").then((mod) => mod.Features),
 );
-const Testimonials = dynamic(() =>
+const Testimonials = nextDynamic(() =>
   import("@/components/landing/Testimonials").then((mod) => mod.Testimonials),
 );
-const Pricing = dynamic(() =>
+const Pricing = nextDynamic(() =>
   import("@/components/landing/Pricing").then((mod) => mod.Pricing),
 );
-const CTA = dynamic(() =>
+const CTA = nextDynamic(() =>
   import("@/components/landing/CTA").then((mod) => mod.CTA),
 );
 
